@@ -4,7 +4,7 @@ import CreateResumeBtn from "../../components/CreateResumeBtn";
 import SeeCollections from "../../components/SeeCollections";
 
 export default async function DashboardPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

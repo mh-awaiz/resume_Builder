@@ -1,34 +1,21 @@
 import { NextResponse } from "next/server";
-import axios from "axios";
+import { createClient } from "../../../lib/supabase/server";
 
 export async function POST(req: Request) {
-  try {
-    const { prompt } = await req.json();
+  const supabase = await createClient();
+  const { resumeData } = await req.json();
 
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.NEXT_PUBLIC_GEMINI_API_KEY}`,
-      {
-        contents: [
-          {
-            parts: [{ text: prompt }],
-          },
-        ],
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": process.env.NEXT_PUBLIC_GEMINI_API_KEY,
-        },
-      }
-    );
+  // Get user from Supabase auth
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    // Extract clean text output
-    const text =
-      response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
-
-    return NextResponse.json({ text });
-  } catch (error: any) {
-    console.error("Gemini API error:", error?.response?.data || error.message);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // Save resumeData in Supabase (or trigger AI resume generation here)
+  console.log("Resume data received:", resumeData);
+
+  return NextResponse.json({ resumeData });
 }
