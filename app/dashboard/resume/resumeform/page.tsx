@@ -151,19 +151,25 @@ export default function ResumeForm({ user }: { user: any }) {
 
       setResponse(text);
 
-      //File upload to the Supabase Bucket - markdown
+      // File upload to the Supabase Bucket - markdown
       const file = new Blob([text], { type: "text/markdown" });
+      const fileName = `resume-${Date.now()}.md`;
+      const filePath = `${user.id}/${fileName}`;
 
       const { data, error } = await supabase.storage
         .from("markdown")
-        .upload(`resume-${user.userId}-${Date.now()}.md`, file, {
+        .upload(filePath, file, {
           cacheControl: "3600",
           upsert: true,
         });
-    } catch (err) {
-      if (response!) {
-        console.log("Text did not generated...", err);
+
+      if (error) {
+        console.error("Upload failed:", error.message);
+      } else {
+        console.log("Uploaded successfully:", data);
       }
+    } catch (err) {
+      console.log("file cant be uploaded", err);
     }
 
     console.log("Generated Resume After api call ", resumeData);
