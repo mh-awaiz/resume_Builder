@@ -1,12 +1,13 @@
-'use client';
+"use client";
 import React from "react";
 import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-primary text-text py-6 flex justify-center items-center border-t border-gray-800 text-slate-200 font-semibold">
-      <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-col justify-between items-center">
-        <div className="mt-4 md:mt-0 grid grid-cols-1 text-center sm:flex sm:flex-row gap-2 p-2">
+    <footer className="bg-primary text-text py-6 border-t border-gray-800 text-slate-200 font-semibold">
+      <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        {/* Navigation Links */}
+        <div className="flex flex-col sm:flex-row gap-2 text-center sm:text-left">
           <Link
             href="/"
             className="text-sm underline hover:text-cta transition"
@@ -20,7 +21,7 @@ export default function Footer() {
             About Us
           </Link>
           <Link
-            href="/Contact"
+            href="/contact"
             className="text-sm underline hover:text-cta transition"
           >
             Contact
@@ -31,13 +32,24 @@ export default function Footer() {
           >
             Terms & Conditions
           </Link>
-        </div>
-        <p className="text-sm">
-          &copy; {new Date().getFullYear()}{" "}
-          <Link href="/" className="text-background font-semibold">
-            MakeResume.
+          <Link
+            href="/privacy&policy"
+            className="text-sm underline hover:text-cta transition"
+          >
+            Privacy Policy
           </Link>
-          <span> </span>All rights reserved.
+        </div>
+
+        {/* Copyright */}
+        <p className="text-sm text-center md:text-right mt-2 md:mt-0">
+          &copy; {new Date().getFullYear()}{" "}
+          <Link
+            href="/"
+            className="text-background font-semibold hover:opacity-80 transition"
+          >
+            MakeResume
+          </Link>
+          . All rights reserved.
         </p>
       </div>
     </footer>

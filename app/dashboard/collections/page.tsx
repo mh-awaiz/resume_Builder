@@ -14,7 +14,6 @@ export default function CollectionPage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
 
-  // ✅ hidden container for HTML → PDF rendering
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,7 +27,6 @@ export default function CollectionPage() {
       }
       setUserId(user.id);
 
-      // list files inside this user's folder
       const { data: list, error } = await supabase.storage
         .from("markdown")
         .list(user.id, {
@@ -58,49 +56,20 @@ export default function CollectionPage() {
 
       if (error || !data) throw error;
 
-      const md = await data.text();
-      const { marked } = await import("marked");
-      const html = marked.parse(md);
+      const md: string = await data.text();
+      const blob = new Blob([md], { type: "text/markdown" });
+      const url = URL.createObjectURL(blob);
 
-      if (containerRef.current) {
-        // render inside hidden container
-        containerRef.current.innerHTML = `<div class="prose">${html}</div>`;
-
-        // 🚑 Sanitize unsupported CSS color functions
-        const elements = containerRef.current.querySelectorAll("*");
-        elements.forEach((el) => {
-          const style = window.getComputedStyle(el as HTMLElement);
-
-          if (style.color.includes("lab") || style.color.includes("oklab")) {
-            (el as HTMLElement).style.color = "#000";
-          }
-
-          if (
-            style.backgroundColor.includes("lab") ||
-            style.backgroundColor.includes("oklab")
-          ) {
-            (el as HTMLElement).style.backgroundColor = "#fff";
-          }
-        });
-
-        const html2pdf = (await import("html2pdf.js")).default;
-
-        await html2pdf()
-          .from(containerRef.current)
-          .set({
-            margin: 10,
-            filename: fileName.replace(/\.md$/, ".pdf"),
-            html2canvas: { scale: 2, backgroundColor: "#fff" },
-            jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          })
-          .save();
-
-        // cleanup
-        containerRef.current.innerHTML = "";
-      }
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("Markdown → PDF failed:", err);
-      alert("Failed to generate PDF");
+      console.error("Markdown download failed:", err);
+      alert("Failed to download Markdown");
     } finally {
       setBusy(null);
     }
@@ -108,13 +77,15 @@ export default function CollectionPage() {
 
   if (loading) return <p className="p-6">Loading…</p>;
   if (!userId)
-    return <p className="p-6">Please log in to see your collection.</p>;
+    return <p className="p-6 text-center text-red-500">Please log in to see your collection.</p>;
 
   return (
-    <main className="max-w-5xl mx-auto p-6 h-screen">
-      <h1 className="text-2xl font-semibold mb-6">Your collection</h1>
+    <main className="min-h-screen w-full max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+      <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-center text-primary mt-16">
+        Your Collection
+      </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {files.map((f) => (
           <FolderCard
             key={f.name}
@@ -126,7 +97,6 @@ export default function CollectionPage() {
         ))}
       </div>
 
-      {/* hidden container for PDF rendering */}
       <div ref={containerRef} className="hidden" />
     </main>
   );

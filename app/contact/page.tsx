@@ -57,9 +57,14 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="min-h-[90vh] px-6 text-primary bg-background font-semibold w-full flex justify-center items-center flex-col">
-      <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
-      <form onSubmit={onSubmit} className="space-y-4">
+    <main className="min-h-[90vh] px-4 sm:px-6 lg:px-8 py-12 text-primary bg-background font-semibold w-full flex justify-center items-center flex-col">
+      <h2 className="text-3xl sm:text-4xl font-bold mb-6 text-center">
+        Contact Us
+      </h2>
+      <form
+        onSubmit={onSubmit}
+        className="space-y-4 w-full max-w-lg bg-white shadow-md rounded-xl p-6"
+      >
         <input
           type="text"
           name="name"
@@ -67,7 +72,7 @@ export default function ContactPage() {
           onChange={handleChange}
           placeholder="Your Name"
           required
-          className="w-full border-2 px-3 py-2 rounded outline-none focus:border-primary transition-all duration-200 bg-background"
+          className="w-full border-2 px-3 py-2 rounded-lg outline-none focus:border-primary transition-all duration-200 bg-background"
         />
         <input
           type="email"
@@ -76,7 +81,7 @@ export default function ContactPage() {
           onChange={handleChange}
           placeholder="Your Email"
           required
-          className="w-full border-2 px-3 py-2 rounded outline-none focus:border-primary transition-all duration-200 bg-background"
+          className="w-full border-2 px-3 py-2 rounded-lg outline-none focus:border-primary transition-all duration-200 bg-background"
         />
         <textarea
           name="message"
@@ -85,15 +90,19 @@ export default function ContactPage() {
           placeholder="Your Message"
           required
           rows={5}
-          className="w-full border-2 px-3 py-2 rounded outline-none focus:border-primary transition-all duration-200 bg-background"
+          className="w-full border-2 px-3 py-2 rounded-lg outline-none focus:border-primary transition-all duration-200 bg-background"
         ></textarea>
         <button
           type="submit"
-          className="bg-primary text-white font-bold px-4 py-2 w-full rounded hover:bg-secondary transition-all duration-200"
+          className="bg-primary text-white font-bold px-4 py-2 w-full rounded-lg hover:bg-secondary transition-all duration-200"
         >
           Send
         </button>
-        <p>{status}</p>
+        {status && (
+          <p className="text-sm text-center text-gray-600 font-medium mt-2">
+            {status}
+          </p>
+        )}
       </form>
     </main>
   );
