@@ -77,7 +77,7 @@ export default function RootLayout({
         {/* Google Search Console verification */}
         <meta
           name="google-site-verification"
-          content={process.env.NEXT_PUBLIC_GSC_VERIFICATION || "YOUR_CODE_HERE"}
+          content={process.env.NEXT_PUBLIC_GSC_VERIFICATION || "MRBYKHpOA65wMeP5_F7ZjyPSpcijC_-SxoyV_VgfRkM"}
         />
       </head>
       <body
