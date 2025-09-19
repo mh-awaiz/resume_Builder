@@ -57,7 +57,7 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="min-h-[90vh] px-4 sm:px-6 lg:px-8 py-12 text-primary bg-background font-semibold w-full flex justify-center items-center flex-col">
+    <main className="min-h-screen px-4 sm:px-6 lg:px-8 py-12 text-primary bg-background font-semibold w-full flex justify-center items-center flex-col">
       <h2 className="text-3xl sm:text-4xl font-bold mb-6 text-center">
         Contact Us
       </h2>

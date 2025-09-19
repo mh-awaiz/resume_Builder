@@ -1,10 +1,9 @@
+// app/head.tsx
 import type { Metadata } from "next";
 import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 
 import { Provider } from "../components/ui/provider";
-
-// Importing components
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -20,7 +19,7 @@ const robotoMono = Roboto_Mono({
   display: "swap",
 });
 
-// ✅ Enhanced SEO metadata
+// ✅ SEO Metadata
 export const metadata: Metadata = {
   title: "MakeResume | AI-Powered Resume Builder",
   description:
@@ -34,12 +33,12 @@ export const metadata: Metadata = {
     "Job Application",
   ],
   authors: [{ name: "MakeResume", url: "https://yourdomain.com" }],
-  themeColor: "#1d4ed8", // Primary brand color
+  // themeColor is deprecated in metadata, move it to viewport or use in <meta> manually if needed
   openGraph: {
     title: "MakeResume | AI-Powered Resume Builder",
     description:
       "Create professional resumes effortlessly with MakeResume, the AI-powered resume builder for job seekers.",
-    url: "https://yourdomain.com",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com",
     siteName: "MakeResume",
     images: [
       {
@@ -64,13 +63,23 @@ export const metadata: Metadata = {
     icon: "/logo.png",
     shortcut: "/favicon.ico",
   },
+  // ✅ Google Search Console verification
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com"),
 };
 
+// Root layout
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Google Search Console verification */}
+        <meta
+          name="google-site-verification"
+          content={process.env.NEXT_PUBLIC_GSC_VERIFICATION || "YOUR_CODE_HERE"}
+        />
+      </head>
       <body
         className={`${inter.variable} ${robotoMono.variable} antialiased bg-background min-h-screen w-full flex flex-col`}
       >
