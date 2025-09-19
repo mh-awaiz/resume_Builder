@@ -64,7 +64,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Actions Section */}
-      <div className="flex flex-col items-center justify-center gap-4">
+      <div className="flex flex-col items-center justify-center gap-4 p-1">
         <CreateResumeBtn />
         <SeeCollections />
       </div>

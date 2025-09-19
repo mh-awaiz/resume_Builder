@@ -1,6 +1,6 @@
 export default function ServicePage() {
   return (
-    <main className="min-h-[90vh] px-6 text-background font-semibold w-full flex justify-center items-center flex-col">
+    <main className="min-h-screen px-6 text-background font-semibold w-full flex justify-center items-center flex-col">
       <h1 className="text-4xl font-bold mb-6 text-primary ">Our Services</h1>
 
         <p className="mb-4 text-black">

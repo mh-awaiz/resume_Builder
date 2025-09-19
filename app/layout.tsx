@@ -1,4 +1,4 @@
-// app/head.tsx
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Inter, Roboto_Mono } from "next/font/google";
@@ -107,6 +107,7 @@ export default function RootLayout({
         <Navbar />
         <Provider>{children}</Provider>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
