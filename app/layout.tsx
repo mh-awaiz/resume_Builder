@@ -1,5 +1,6 @@
 // app/head.tsx
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -64,7 +65,9 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
   },
   // ✅ Google Search Console verification
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com"
+  ),
 };
 
 // Root layout
@@ -77,8 +80,26 @@ export default function RootLayout({
         {/* Google Search Console verification */}
         <meta
           name="google-site-verification"
-          content={process.env.NEXT_PUBLIC_GSC_VERIFICATION || "MRBYKHpOA65wMeP5_F7ZjyPSpcijC_-SxoyV_VgfRkM"}
+          content={
+            process.env.NEXT_PUBLIC_GSC_VERIFICATION ||
+            "MRBYKHpOA65wMeP5_F7ZjyPSpcijC_-SxoyV_VgfRkM"
+          }
         />
+
+        {/* Google Analytics */}
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=G-J8LCCNRL0L`}
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-J8LCCNRL0L');
+          `}
+        </Script>
       </head>
       <body
         className={`${inter.variable} ${robotoMono.variable} antialiased bg-background min-h-screen w-full flex flex-col`}
