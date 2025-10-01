@@ -20,7 +20,6 @@
     "@supabase/supabase-js": "^2.56.1",
     "@vercel/analytics": "^1.5.0",
     "axios": "^1.11.0",
-    "chrome-aws-lambda": "^10.1.0",
     "framer-motion": "^12.23.22",
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.3",
