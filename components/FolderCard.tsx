@@ -31,7 +31,7 @@ export default function FolderCard({
         className="inline-flex items-center gap-2 rounded-xl px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 m-1"
         aria-label={`Download ${name} as PDF`}
       >
-        {busy ? "Exporting…" : "PDF"}
+        {"View"}
       </button>
     </div>
   );

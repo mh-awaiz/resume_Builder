@@ -1,0 +1,67 @@
+"use client";
+
+import { useState } from "react";
+import { createClient } from "../lib/supabase/browser";
+import { useRouter } from "next/navigation";
+
+export default function LoginForm() {
+  const supabase = createClient();
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) return setError(error.message);
+
+    // ✅ push to dashboard after login
+    router.push("/dashboard");
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4 bg-background text-primary">
+      <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-6">
+        <h2 className="text-2xl font-bold mb-4 text-center text-primary">
+          Login
+        </h2>
+
+        <form onSubmit={handleLogin} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="border rounded w-full p-3 outline-none font-semibold text-primary bg-transparent focus:border-primary focus:ring-1 focus:ring-primary"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="border rounded w-full p-3 outline-none font-semibold text-primary bg-transparent focus:border-primary focus:ring-1 focus:ring-primary"
+          />
+
+          <button
+            type="submit"
+            className="w-full px-6 py-2 bg-blue-600 text-white rounded-md shadow-md hover:bg-blue-700 font-semibold transition-all duration-200"
+          >
+            Login
+          </button>
+        </form>
+
+        {error && <p className="text-red-500 mt-2 text-center">{error}</p>}
+      </div>
+    </div>
+  );
+}

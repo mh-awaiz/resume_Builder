@@ -98,48 +98,111 @@ export default function ResumeForm({ user }: { user: any }) {
     const genAI = new GoogleGenerativeAI(apiKey);
 
     const queryString = `
-      You are a professional resume generator.  
-      Generate a **resume in Markdown format ONLY**.  
-  
-      ⚠️ Rules:
-      - No triple backticks
-      - No explanations
-      - Only the resume content
-  
-      Format must follow this structure:
-      # <span style="color:#155dfc">Full Name</span>  
-      **Location:** City, Country | **Contact:** Phone Number | **LinkedIn:** [LinkedIn URL](LinkedIn URL)  
-  
-      ---
-  
-      ## <span style="color:#155dfc">Professional Summary</span>  
-      [3–4 line summary]  
-  
-      ---
-  
-      ## <span style="color:#155dfc">Technical Skills</span>  
-      * **Skill 1:** Level (Years)  
-  
-      ---
-  
-      ## <span style="color:#155dfc">Projects</span>  
-      * **Project Title:** [Project Link]  
-        * Description: [Short description]  
-        * Tech Stack: [Tech used]  
-        * Date: [Year]  
-  
-      ---
-  
-      ## <span style="color:#155dfc">Education</span>  
-      * **Degree:** Field - University - Graduation Year  
-  
-      ---
-  
-      ## <span style="color:#155dfc">Certifications</span>  
-      * **Certification Name** - Issuer - Date  
-  
-      Here are the details in JSON format: ${JSON.stringify(resumeData)}
-    `;
+  You are a professional resume generator.  
+  Generate a **resume in clean HTML format ONLY**.  
+
+  ⚠️ Rules:
+  - No Markdown
+  - No triple backticks
+  - No explanations
+  - Only output valid HTML with inline CSS or a <style> section
+  - Use modern, professional typography (system fonts like Arial/Helvetica)
+  - Use #155dfc for section headers
+  - Keep layout clean, spaced, and scannable like a professional resume
+
+  Format must follow this structure:
+
+  <html>
+    <head>
+      <style>
+        body {
+          font-family: Arial, Helvetica, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        h1, h2 {
+          color: #155dfc;
+          margin-bottom: 8px;
+        }
+        h1 {
+          font-size: 28px;
+        }
+        h2 {
+          font-size: 20px;
+          margin-top: 24px;
+        }
+        .section {
+          margin-bottom: 20px;
+        }
+        .divider {
+          border-top: 2px solid #eee;
+          margin: 16px 0;
+        }
+        .header {
+          font-weight: bold;
+          margin-bottom: 4px;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Full Name</h1>
+      <p><strong>Location:</strong> City, Country | <strong>Contact:</strong> Phone Number | <strong>LinkedIn:</strong> <a href="LinkedIn URL">LinkedIn URL</a></p>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>Professional Summary</h2>
+        <p>[3–4 line summary]</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>Technical Skills</h2>
+        <ul>
+          <li><strong>Skill 1:</strong> Level (Years)</li>
+        </ul>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>Projects</h2>
+        <ul>
+          <li>
+            <strong>Project Title:</strong> <a href="[Project Link]">[Project Link]</a><br/>
+            Description: [Short description]<br/>
+            Tech Stack: [Tech used]<br/>
+            Date: [Year]
+          </li>
+        </ul>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>Education</h2>
+        <ul>
+          <li><strong>Degree:</strong> Field - University - Graduation Year</li>
+        </ul>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>Certifications</h2>
+        <ul>
+          <li><strong>Certification Name</strong> - Issuer - Date</li>
+        </ul>
+      </div>
+    </body>
+  </html>
+
+  Here are the details in JSON format: ${JSON.stringify(resumeData)}
+`;
 
     try {
       //Gemini Api Response
@@ -152,8 +215,8 @@ export default function ResumeForm({ user }: { user: any }) {
       setResponse(text);
 
       // File upload to the Supabase Bucket - markdown
-      const file = new Blob([text], { type: "text/markdown" });
-      const fileName = `resume-${Date.now()}.md`;
+      const file = new Blob([text], { type: "text/resume" });
+      const fileName = `resume-${Date.now()}.html`;
       const filePath = `${user.id}/${fileName}`;
 
       const { data, error } = await supabase.storage

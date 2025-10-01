@@ -11,8 +11,13 @@ export default function Navbar() {
   const supabase = createClient();
   const [user, setUser] = useState<any>(null);
   const [showLogout, setShowLogout] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false); // mobile menu toggle
+  const [menuOpen, setMenuOpen] = useState(false);
 
+  // Navbar hide/show state
+  const [showNavbar, setShowNavbar] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  // Fetch user
   useEffect(() => {
     const getUser = async () => {
       const {
@@ -33,8 +38,30 @@ export default function Navbar() {
     };
   }, [supabase]);
 
+  // Hide/show navbar on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > lastScrollY) {
+        // scroll down -> hide
+        setShowNavbar(false);
+      } else {
+        // scroll up -> show
+        setShowNavbar(true);
+      }
+      setLastScrollY(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
   return (
-    <nav className="fixed bg-primary px-6 py-4 flex items-center justify-between shadow-md w-full z-50">
+    <nav
+      className={`fixed top-0 left-0 right-0 bg-primary px-6 py-4 flex items-center justify-between shadow-md w-full z-50 transition-transform duration-300 ${
+        showNavbar ? "translate-y-0" : "-translate-y-full"
+      }`}
+    >
       {/* Logo */}
       <div className="flex items-center space-x-2">
         <FaRegFileAlt className="text-2xl text-white" />
@@ -106,7 +133,7 @@ export default function Navbar() {
       {/* Mobile Menu Dropdown */}
       {menuOpen && (
         <div className="absolute top-16 left-0 w-full bg-primary shadow-md flex flex-col items-center space-y-4 py-6 md:hidden">
-          {[
+          {[ 
             { name: "Home", href: "/" },
             { name: "About", href: "/about" },
             { name: "Service", href: "/service" },
@@ -117,16 +144,10 @@ export default function Navbar() {
               key={item.name}
               href={item.href}
               onClick={() => setMenuOpen(false)}
-              className="w-11/12 text-center py-2 rounded-lg text-white font-medium
-                   transition-all duration-300 relative group hover:text-primary "
+              className="w-11/12 text-center py-2 rounded-lg text-white font-medium transition-all duration-300 relative group hover:text-primary"
             >
               <span className="relative z-10">{item.name}</span>
-              {/* Cool hover effect */}
-              <span
-                className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 
-                         bg-gradient-to-r from-secondary via-background to-primary 
-                         transition-opacity duration-300"
-              ></span>
+              <span className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 bg-gradient-to-r from-secondary via-background to-primary transition-opacity duration-300"></span>
             </Link>
           ))}
 
@@ -140,38 +161,20 @@ export default function Navbar() {
               className="w-11/12 py-2 rounded-lg text-white font-semibold transition-all duration-300 relative group"
             >
               <span className="relative z-10">Logout</span>
-              <span
-                className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 
-                         bg-gradient-to-r from-red-400 to-red-600 
-                         transition-opacity duration-300"
-              ></span>
+              <span className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 bg-gradient-to-r from-red-400 to-red-600 transition-opacity duration-300"></span>
             </button>
           ) : (
             <div className="flex flex-col space-y-3 w-11/12">
               <Link href="/login">
-                <button
-                  className="w-full py-2 rounded-lg bg-background text-primary font-semibold 
-                             transition-all duration-300 relative group"
-                >
+                <button className="w-full py-2 rounded-lg bg-background text-primary font-semibold transition-all duration-300 relative group">
                   <span className="relative z-10">Login</span>
-                  <span
-                    className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 
-                             bg-gradient-to-r from-primary via-secondary to-background 
-                             transition-opacity duration-300"
-                  ></span>
+                  <span className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 bg-gradient-to-r from-primary via-secondary to-background transition-opacity duration-300"></span>
                 </button>
               </Link>
               <Link href="/signup">
-                <button
-                  className="w-full py-2 rounded-lg bg-secondary text-background font-semibold 
-                             transition-all duration-300 relative group"
-                >
+                <button className="w-full py-2 rounded-lg bg-secondary text-background font-semibold transition-all duration-300 relative group">
                   <span className="relative z-10">Sign Up</span>
-                  <span
-                    className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 
-                             bg-gradient-to-r from-background via-primary to-secondary 
-                             transition-opacity duration-300"
-                  ></span>
+                  <span className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 bg-gradient-to-r from-background via-primary to-secondary transition-opacity duration-300"></span>
                 </button>
               </Link>
             </div>
