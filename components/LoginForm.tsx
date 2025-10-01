@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "../lib/supabase/browser";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginForm() {
   const supabase = createClient();
@@ -51,6 +52,8 @@ export default function LoginForm() {
             required
             className="border rounded w-full p-3 outline-none font-semibold text-primary bg-transparent focus:border-primary focus:ring-1 focus:ring-primary"
           />
+
+          <p className="text-gray-500 font-light">Dont have an account <Link href="signup" className="text-primary font-bold">Sign Up</Link> </p>
 
           <button
             type="submit"
