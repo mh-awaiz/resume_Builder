@@ -13,16 +13,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Determine if running on Vercel (serverless)
     const isServerless = !!process.env.VERCEL;
 
     let puppeteer: any;
     let chromium: any;
 
     if (isServerless) {
-      // Serverless environment (Vercel)
-      chromium = (await import("chrome-aws-lambda")).default;
+      // Serverless: Vercel
       puppeteer = (await import("puppeteer-core")).default;
+      chromium = (await import("@sparticuz/chromium")).default;
     } else {
       // Local development
       puppeteer = (await import("puppeteer")).default;
@@ -32,7 +31,7 @@ export async function POST(req: NextRequest) {
       isServerless
         ? {
             args: chromium.args,
-            executablePath: await chromium.executablePath,
+            executablePath: await chromium.executablePath(),
             headless: chromium.headless,
           }
         : { headless: true }
