@@ -5,7 +5,7 @@ import Reviews from "./Sections/Reviews";
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center overflow-x-hidden bg-background">
+    <main className="min-h-screen flex flex-col items-center justify-center overflow-x-hidden bg-background px-6">
       <HeroSection />
       <FeaturesSection />
       <Reviews />
