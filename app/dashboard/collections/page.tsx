@@ -50,7 +50,10 @@ export default function CollectionPage() {
 
       const { data: list, error } = await supabase.storage
         .from("markdown")
-        .list(user.id, { limit: 100, sortBy: { column: "created_at", order: "desc" } });
+        .list(user.id, {
+          limit: 100,
+          sortBy: { column: "created_at", order: "desc" },
+        });
 
       if (error) {
         console.error("List error:", error.message);
@@ -118,7 +121,18 @@ export default function CollectionPage() {
         }),
       });
 
-      if (!response.ok) throw new Error("PDF generation failed");
+      if (!response.ok) {
+        // Try to read error details from the API
+        let errorMsg = "PDF generation failed";
+        try {
+          const data = await response.json();
+          if (data?.error) errorMsg = data.error;
+          if (data?.details) errorMsg += `: ${data.details}`;
+        } catch (jsonErr) {
+          console.error("Failed to parse error JSON", jsonErr);
+        }
+        throw new Error(errorMsg);
+      }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -129,9 +143,9 @@ export default function CollectionPage() {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to download PDF. See console for details.");
+    } catch (err: any) {
+      console.error("PDF download error:", err);
+      alert(`Failed to download PDF.\n${err.message}`);
     } finally {
       setDownloading(false);
     }
@@ -152,7 +166,9 @@ export default function CollectionPage() {
       </h1>
 
       {files.length === 0 ? (
-        <p className="text-center text-gray-500">You have no files in your collection.</p>
+        <p className="text-center text-gray-500">
+          You have no files in your collection.
+        </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {files.map((f) => (
@@ -186,7 +202,9 @@ export default function CollectionPage() {
                 </button>
                 <button
                   className={`px-3 py-1 rounded text-white ${
-                    downloading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                    downloading
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
                   }`}
                   onClick={handleDownload}
                   disabled={downloading}
