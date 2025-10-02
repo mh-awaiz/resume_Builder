@@ -92,7 +92,7 @@ export default function Navbar() {
       </ul>
 
       {/* Mobile Menu Button */}
-      <div className="md:hidden text-white text-2xl">
+      <div className="md:hidden text-white text-2xl space-x-2">
         <button onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <FiX /> : <FiMenu />}
         </button>

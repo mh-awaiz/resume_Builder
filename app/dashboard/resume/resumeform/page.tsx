@@ -3,8 +3,10 @@
 import React, { useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createClient } from "../../../../lib/supabase/browser";
+import { useRouter } from "next/navigation";
 
 export default function ResumeForm({ user }: { user: any }) {
+  const router = useRouter();
   const supabase = createClient();
 
   const [skills, setSkills] = useState([
@@ -81,6 +83,7 @@ export default function ResumeForm({ user }: { user: any }) {
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setLoading(true);
     e.preventDefault();
 
     const resumeData = {
@@ -98,110 +101,69 @@ export default function ResumeForm({ user }: { user: any }) {
     const genAI = new GoogleGenerativeAI(apiKey);
 
     const queryString = `
-  You are a professional resume generator.  
-  Generate a **resume in clean HTML format ONLY**.  
+      SYSTEM / DNA PROMPT:
 
-  ⚠️ Rules:
-  - No Markdown
-  - No triple backticks
-  - No explanations
-  - Only output valid HTML with inline CSS or a <style> section
-  - Use modern, professional typography (system fonts like Arial/Helvetica)
-  - Use #155dfc for section headers
-  - Keep layout clean, spaced, and scannable like a professional resume
+      You are a professional resume generator. 
+      Produce ONLY one valid, self-contained HTML document (<!doctype html> ... </html>) representing a clean, ATS-optimized resume. 
+      Follow these rules exactly:
 
-  Format must follow this structure:
+      OUTPUT RULES:
+      - Output ONLY valid HTML. No Markdown, no backticks, no explanations, no comments.
+      - Use semantic HTML5 (<header>, <main>, <section>, <h1>-<h3>, <ul>, <li>, <p>, <footer>).
+      - Avoid tables, images, icons, or graphics unless explicitly provided.
+      - Use <style> in <head> for CSS. Keep CSS minimal and ATS-safe (font, spacing, colors).
+      - Font: system stack (-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif).
+      - Use #155dfc for section headings. Body text: #222.
+      - Keep the structure linear and scannable: header (name + contact), summary, skills, experience, education, certifications, projects, languages.
+      - Experience: use <h3> for job titles, <p> for company + dates, and <ul><li> for bullet achievements.
+      - Ensure dates are plain text (e.g., "Jan 2020 – Present").
+      - Do not use text inside images. All content must be text for ATS parsing.
+      - No hidden elements, no complex layouts, no unnecessary div nesting.
 
-  <html>
-    <head>
-      <style>
-        body {
-          font-family: Arial, Helvetica, sans-serif;
-          line-height: 1.6;
-          color: #333;
-          max-width: 800px;
-          margin: 0 auto;
-          padding: 20px;
-        }
-        h1, h2 {
-          color: #155dfc;
-          margin-bottom: 8px;
-        }
-        h1 {
-          font-size: 28px;
-        }
-        h2 {
-          font-size: 20px;
-          margin-top: 24px;
-        }
-        .section {
-          margin-bottom: 20px;
-        }
-        .divider {
-          border-top: 2px solid #eee;
-          margin: 16px 0;
-        }
-        .header {
-          font-weight: bold;
-          margin-bottom: 4px;
-        }
-      </style>
-    </head>
-    <body>
-      <h1>Full Name</h1>
-      <p><strong>Location:</strong> City, Country | <strong>Contact:</strong> Phone Number | <strong>LinkedIn:</strong> <a href="LinkedIn URL">LinkedIn URL</a></p>
+      CONTENT RULES:
+      - Tone: professional, concise, strong action verbs.
+      - Skills: always plain text (comma separated or bulleted).
+      - Experience: reverse-chronological, each job with measurable achievements if possible.
+      - Education: include degree, school, and years.
+      - Omit any section if no data is provided.
+      - If input bullets are vague, rewrite them into results-driven achievements.
+      - If target_role or keywords are provided, prioritize them in summary and skills.
 
-      <div class="divider"></div>
+      INPUT:
+      You will receive resume data in JSON format:
+      ${JSON.stringify(resumeData)}
 
-      <div class="section">
-        <h2>Professional Summary</h2>
-        <p>[3–4 line summary]</p>
-      </div>
+      EXPECTED STRUCTURE:
+      <!doctype html>
+      <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <title>Resume - [name]</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #222; margin: 40px; line-height: 1.4; }
+          header { text-align: center; margin-bottom: 20px; }
+          h1 { font-size: 28px; margin: 0; }
+          h2 { color: #155dfc; font-size: 18px; margin-top: 30px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+          h3 { font-size: 16px; margin: 10px 0 4px; }
+          ul { margin: 0; padding-left: 20px; }
+          p { margin: 4px 0; }
+        </style>
+      </head>
+      <body>
+        <header>...</header>
+        <main>
+          <section id="summary">...</section>
+          <section id="skills">...</section>
+          <section id="experience">...</section>
+          <section id="education">...</section>
+          <section id="certifications">...</section>
+          <section id="projects">...</section>
+          <section id="languages">...</section>
+        </main>
+      </body>
+      </html>
 
-      <div class="divider"></div>
-
-      <div class="section">
-        <h2>Technical Skills</h2>
-        <ul>
-          <li><strong>Skill 1:</strong> Level (Years)</li>
-        </ul>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="section">
-        <h2>Projects</h2>
-        <ul>
-          <li>
-            <strong>Project Title:</strong> <a href="[Project Link]">[Project Link]</a><br/>
-            Description: [Short description]<br/>
-            Tech Stack: [Tech used]<br/>
-            Date: [Year]
-          </li>
-        </ul>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="section">
-        <h2>Education</h2>
-        <ul>
-          <li><strong>Degree:</strong> Field - University - Graduation Year</li>
-        </ul>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="section">
-        <h2>Certifications</h2>
-        <ul>
-          <li><strong>Certification Name</strong> - Issuer - Date</li>
-        </ul>
-      </div>
-    </body>
-  </html>
-
-  Here are the details in JSON format: ${JSON.stringify(resumeData)}
+      END OF PROMPT. Generate the HTML resume now using the input data.
 `;
 
     try {
@@ -233,11 +195,10 @@ export default function ResumeForm({ user }: { user: any }) {
       }
     } catch (err) {
       console.log("file cant be uploaded", err);
+    } finally {
+      setLoading(false);
+      router.push("/dashboard/collections");
     }
-
-    console.log("Generated Resume After api call ", resumeData);
-
-    // Reset all fields
     setFullName("");
     setLocation("");
     setNumber("");
@@ -640,7 +601,7 @@ export default function ResumeForm({ user }: { user: any }) {
           >
             {loading ? "Generating..." : "Generate Resume"}
           </button>
-          <p>{response}</p>
+          {/* <p>{response}</p> */}
         </div>
       </form>
     </main>

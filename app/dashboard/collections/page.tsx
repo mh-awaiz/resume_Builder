@@ -17,24 +17,13 @@ export default function CollectionPage() {
   // Preview state
   const [previewHtml, setPreviewHtml] = useState<string>("");
   const [previewFile, setPreviewFile] = useState<string | null>(null);
-  const [atsScore, setAtsScore] = useState<number | null>(null);
+  const [atsScore, setAtsScore] = useState<{
+    keywordScore: number;
+    formatScore: number;
+    finalScore: number;
+  } | null>(null);
+  const [keywordsInput, setKeywordsInput] = useState<string>(""); // dynamic input
   const previewRef = useRef<HTMLDivElement>(null);
-
-  // Keywords to check for ATS score
-  const atsKeywords = [
-    "React",
-    "Next.js",
-    "Tailwind",
-    "JavaScript",
-    "TypeScript",
-    "Full-Stack",
-    "Node.js",
-    "HTML",
-    "CSS",
-    "API",
-    "Git",
-    "Database",
-  ];
 
   // Fetch files
   useEffect(() => {
@@ -64,12 +53,49 @@ export default function CollectionPage() {
     })();
   }, [supabase]);
 
-  // Calculate ATS score
-  const calculateAtsScore = (html: string) => {
+  // Calculate ATS score using dynamic keywords + format check
+  const calculateAtsScore = (html: string, keywords: string[]) => {
+    if (!keywords.length) {
+      setAtsScore(null);
+      return;
+    }
+
     const text = html.replace(/<[^>]+>/g, " ").toLowerCase();
-    const matched = atsKeywords.filter((k) => text.includes(k.toLowerCase()));
-    const score = Math.round((matched.length / atsKeywords.length) * 100);
-    setAtsScore(score);
+
+    // --- Keyword Score ---
+    const matched = keywords.filter((k) =>
+      text.includes(k.trim().toLowerCase())
+    );
+    const keywordScore = Math.round((matched.length / keywords.length) * 100);
+
+    // --- Format Score ---
+    let formatPoints = 0;
+    const totalPoints = 6;
+
+    // 1. Contact info (email or phone)
+    if (/\b\d{10}\b/.test(text) || /@\w+\.\w+/.test(text)) formatPoints++;
+
+    // 2. Summary section
+    if (/summary|objective/i.test(html)) formatPoints++;
+
+    // 3. Skills section
+    if (/skills/i.test(html)) formatPoints++;
+
+    // 4. Experience section with dates
+    if (/experience/i.test(html) && /\b(20\d{2}|19\d{2})\b/.test(text)) formatPoints++;
+
+    // 5. Education section
+    if (/education/i.test(html)) formatPoints++;
+
+    // 6. Bullet points
+    if (/<li>/.test(html)) formatPoints++;
+
+    const formatScore = Math.round((formatPoints / totalPoints) * 100);
+
+    // --- Final Score (weighted 50/50) ---
+    const finalScore = Math.round(keywordScore * 0.5 + formatScore * 0.5);
+
+    setAtsScore({ keywordScore, formatScore, finalScore });
   };
 
   // View / preview a file
@@ -96,8 +122,8 @@ export default function CollectionPage() {
       setPreviewHtml(finalHtml);
       setPreviewFile(fileName);
 
-      // Calculate ATS score
-      calculateAtsScore(finalHtml);
+      // Reset score when opening new preview
+      setAtsScore(null);
     } catch (err) {
       console.error("Preview failed:", err);
       alert("Failed to load preview");
@@ -122,7 +148,6 @@ export default function CollectionPage() {
       });
 
       if (!response.ok) {
-        // Try to read error details from the API
         let errorMsg = "PDF generation failed";
         try {
           const data = await response.json();
@@ -214,11 +239,42 @@ export default function CollectionPage() {
               </div>
             </div>
 
+            {/* Dynamic keyword input */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">
+                Enter Keywords (comma separated)
+              </label>
+              <input
+                type="text"
+                value={keywordsInput}
+                onChange={(e) => setKeywordsInput(e.target.value)}
+                placeholder="e.g. React, Next.js, Tailwind"
+                className="w-full px-3 py-2 border rounded bg-gray-50 focus:outline-none focus:ring focus:border-blue-300"
+              />
+              <button
+                onClick={() =>
+                  calculateAtsScore(
+                    previewHtml,
+                    keywordsInput
+                      .split(",")
+                      .map((k) => k.trim())
+                      .filter(Boolean)
+                  )
+                }
+                className="mt-2 px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                Calculate ATS Score
+              </button>
+            </div>
+
             {/* ATS Score */}
-            {atsScore !== null && (
-              <p className="mb-2 font-medium text-green-700">
-                ATS Score: {atsScore}%
-              </p>
+            {atsScore && (
+              <div className="mb-2 font-medium text-green-700">
+                <p>ATS Score: {atsScore.finalScore}%</p>
+                <p className="text-sm text-gray-600">
+                  Keywords: {atsScore.keywordScore}% | Format: {atsScore.formatScore}%
+                </p>
+              </div>
             )}
 
             <div

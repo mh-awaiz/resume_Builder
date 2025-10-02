@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     title: "Dashboard | MakeResume",
     description:
       "Access your personalized dashboard to create and manage resumes with MakeResume.",
-    url: `${BASE_URL}/dashboard`, // ✅ use env variable
+    url: `${BASE_URL}/dashboard`, 
     siteName: "MakeResume",
     images: [
       {
@@ -64,7 +64,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Actions Section */}
-      <div className="flex flex-col items-center justify-center gap-4 p-1">
+      <div className="flex flex-col items-center justify-center gap-4 p-1 space-x-2">
         <CreateResumeBtn />
         <SeeCollections />
       </div>

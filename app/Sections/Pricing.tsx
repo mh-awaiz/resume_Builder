@@ -3,9 +3,16 @@
 import { motion } from "framer-motion";
 
 const plans = [
-  { name: "Basic", price: "$10/mo", features: ["One Template", "PDF Export"] },
-  { name: "Pro", price: "$30/mo", features: ["All Templates", "PDF & Online Share", "Priority Support"] },
-  { name: "Enterprise", price: "$60/mo", features: ["Custom Templates", "Team Accounts", "Full Support"] },
+  { 
+    name: "Free", 
+    price: "₹0", 
+    features: ["Create up to 3 Resumes", "Basic Templates", "Export to PDF"] 
+  },
+  { 
+    name: "Lifetime", 
+    price: "₹100 (one-time)", 
+    features: ["Unlimited Resume Creation", "All Premium Templates", "Lifetime Access"] 
+  },
 ];
 
 export default function Pricing() {
@@ -30,7 +37,7 @@ export default function Pricing() {
               ))}
             </ul>
             <button className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-secondary transition-all duration-300">
-              Choose Plan
+              {plan.name === "Free" ? "Start Free" : "Get Lifetime Access"}
             </button>
           </motion.div>
         ))}
