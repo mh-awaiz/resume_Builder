@@ -5,20 +5,20 @@ import ResumeForm from "./resumeform/page";
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL;
 
 export const metadata: Metadata = {
-  title: "Resume Dashboard | MakeResume",
-  description: "Create and manage your resumes with MakeResume's AI-powered dashboard.",
-  keywords: ["Resume Dashboard", "MakeResume", "AI Resume Builder", "Resume Management"],
+  title: "Resume Dashboard | CViEx",
+  description: "Create and manage your resumes with CViEx AI-powered dashboard.",
+  keywords: ["Resume Dashboard", "CViEx", "AI Resume Builder", "Resume Management"],
   openGraph: {
-    title: "Resume Dashboard | MakeResume",
-    description: "Access your personalized dashboard to create and manage resumes with MakeResume.",
+    title: "Resume Dashboard | CViEx",
+    description: "Access your personalized dashboard to create and manage resumes with CViEx.",
     url: `${BASE_URL}/dashboard/resume`,
-    siteName: "MakeResume",
+    siteName: "CViEx",
     images: [
       {
         url: `${BASE_URL}/og-resume-dashboard.png`,
         width: 1200,
         height: 630,
-        alt: "Resume Dashboard MakeResume",
+        alt: "Resume Dashboard CViEx",
       },
     ],
     locale: "en_US",

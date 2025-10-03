@@ -6,37 +6,37 @@ export default function GlobalNotFound() {
     <>
       {/* 🔹 SEO + Open Graph + Twitter Meta Tags */}
       <Head>
-        <title>404 - Page Not Found | MakeResume</title>
+        <title>404 - Page Not Found | CViEx</title>
         <meta
           name="description"
-          content="The page you are looking for does not exist. Return to the MakeResume homepage and continue building your AI-powered resume."
+          content="The page you are looking for does not exist. Return to the CViEx homepage and continue building your AI-powered resume."
         />
         <meta name="robots" content="noindex, follow" />
-        <meta name="author" content="MakeResume" />
+        <meta name="author" content="CViEx" />
 
         {/* Open Graph */}
-        <meta property="og:title" content="404 - Page Not Found | MakeResume" />
+        <meta property="og:title" content="404 - Page Not Found | CViEx" />
         <meta
           property="og:description"
-          content="Oops! This page could not be found. Go back to the MakeResume homepage."
+          content="Oops! This page could not be found. Go back to the CViEx homepage."
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://makeresume.com/404" />
+        <meta property="og:url" content="https://CViEx.com/404" />
         <meta
           property="og:image"
-          content="https://makeresume.com/og-image.png"
+          content="https://CViEx.com/og-image.png"
         />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="404 - Page Not Found | MakeResume" />
+        <meta name="twitter:title" content="404 - Page Not Found | CViEx" />
         <meta
           name="twitter:description"
-          content="The page you were looking for could not be found. Return to MakeResume."
+          content="The page you were looking for could not be found. Return to CViEx."
         />
         <meta
           name="twitter:image"
-          content="https://makeresume.com/og-image.png"
+          content="https://CViEx.com/og-image.png"
         />
       </Head>
 

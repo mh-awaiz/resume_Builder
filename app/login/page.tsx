@@ -4,14 +4,14 @@ import LoginForm from "../../components/LoginForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Login | Resume Builder",
-  description: "Login to access your personalized resume builder dashboard.",
-  keywords: ["login", "resume builder", "authentication", "resume platform"],
+  title: "Login | CViEx",
+  description: "Login to access your personalized CViEx dashboard.",
+  keywords: ["login", "CViEx", "authentication", "resume platform"],
   openGraph: {
-    title: "Login | Resume Builder",
-    description: "Login to access your personalized resume builder dashboard.",
+    title: "Login | CViEx",
+    description: "Login to access your personalized CViEx dashboard.",
     url: "https://yourdomain.com/login",
-    siteName: "Resume Builder",
+    siteName: "CViEx",
   },
 };
 

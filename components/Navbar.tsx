@@ -63,10 +63,10 @@ export default function Navbar() {
       }`}
     >
       {/* Logo */}
-      <div className="flex items-center space-x-2">
+      <div className="flex justify-center items-center space-x-2">
         <FaRegFileAlt className="text-2xl text-white" />
         <Link href="/" className="text-xl font-bold text-white">
-          makeResume
+          CViEx
         </Link>
       </div>
 

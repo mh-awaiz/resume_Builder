@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "../../../lib/supabase/browser";
 import FolderCard from "../../../components/FolderCard";
 
@@ -8,11 +9,14 @@ type FileEntry = { name: string };
 
 export default function CollectionPage() {
   const supabase = createClient();
+  const router = useRouter();
+
   const [userId, setUserId] = useState<string | null>(null);
   const [files, setFiles] = useState<FileEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
 
   // Preview state
   const [previewHtml, setPreviewHtml] = useState<string>("");
@@ -22,10 +26,13 @@ export default function CollectionPage() {
     formatScore: number;
     finalScore: number;
   } | null>(null);
-  const [keywordsInput, setKeywordsInput] = useState<string>(""); // dynamic input
+  const [keywordsInput, setKeywordsInput] = useState<string>("");
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // Fetch files
+  // NEW: See More toggle
+  const [showAll, setShowAll] = useState(false);
+
+  // Fetch files & profile
   useEffect(() => {
     (async () => {
       const {
@@ -47,13 +54,27 @@ export default function CollectionPage() {
       if (error) {
         console.error("List error:", error.message);
       } else {
-        setFiles(list ?? []);
+        setFiles((list as any) ?? []);
       }
+
+      // fetch profile to check premium status
+      const { data: profile, error: pErr } = await supabase
+        .from("profiles")
+        .select("is_premium")
+        .eq("id", user.id)
+        .single();
+
+      if (pErr) {
+        console.error("Profile fetch error:", pErr.message);
+      } else {
+        setIsPremium(Boolean((profile as any)?.is_premium));
+      }
+
       setLoading(false);
     })();
   }, [supabase]);
 
-  // Calculate ATS score using dynamic keywords + format check
+  // calculateAtsScore (unchanged)
   const calculateAtsScore = (html: string, keywords: string[]) => {
     if (!keywords.length) {
       setAtsScore(null);
@@ -62,43 +83,29 @@ export default function CollectionPage() {
 
     const text = html.replace(/<[^>]+>/g, " ").toLowerCase();
 
-    // --- Keyword Score ---
     const matched = keywords.filter((k) =>
       text.includes(k.trim().toLowerCase())
     );
     const keywordScore = Math.round((matched.length / keywords.length) * 100);
 
-    // --- Format Score ---
     let formatPoints = 0;
     const totalPoints = 6;
 
-    // 1. Contact info (email or phone)
     if (/\b\d{10}\b/.test(text) || /@\w+\.\w+/.test(text)) formatPoints++;
-
-    // 2. Summary section
     if (/summary|objective/i.test(html)) formatPoints++;
-
-    // 3. Skills section
     if (/skills/i.test(html)) formatPoints++;
-
-    // 4. Experience section with dates
-    if (/experience/i.test(html) && /\b(20\d{2}|19\d{2})\b/.test(text)) formatPoints++;
-
-    // 5. Education section
+    if (/experience/i.test(html) && /\b(20\d{2}|19\d{2})\b/.test(text))
+      formatPoints++;
     if (/education/i.test(html)) formatPoints++;
-
-    // 6. Bullet points
     if (/<li>/.test(html)) formatPoints++;
 
     const formatScore = Math.round((formatPoints / totalPoints) * 100);
-
-    // --- Final Score (weighted 50/50) ---
     const finalScore = Math.round(keywordScore * 0.5 + formatScore * 0.5);
 
     setAtsScore({ keywordScore, formatScore, finalScore });
   };
 
-  // View / preview a file
+  // View a file
   const handleView = async (fileName: string) => {
     if (!userId) return;
     setBusy(fileName);
@@ -111,7 +118,6 @@ export default function CollectionPage() {
 
       const html = await data.text();
 
-      // Extract <style> and <body>
       const styles = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)]
         .map((m) => m[1])
         .join("\n");
@@ -122,7 +128,6 @@ export default function CollectionPage() {
       setPreviewHtml(finalHtml);
       setPreviewFile(fileName);
 
-      // Reset score when opening new preview
       setAtsScore(null);
     } catch (err) {
       console.error("Preview failed:", err);
@@ -132,7 +137,7 @@ export default function CollectionPage() {
     }
   };
 
-  // Download PDF
+  // Download as PDF
   const handleDownload = async () => {
     if (!previewHtml || !previewFile) return;
     setDownloading(true);
@@ -176,6 +181,9 @@ export default function CollectionPage() {
     }
   };
 
+  // Derive visible files
+  const visibleFiles = showAll ? files : files.slice(0, 4);
+
   if (loading) return <p className="p-6 text-center">Loading…</p>;
   if (!userId)
     return (
@@ -190,22 +198,58 @@ export default function CollectionPage() {
         Your Collection
       </h1>
 
+      {/* WARNING for free users */}
+      {!isPremium && files.length >= 3 && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-md">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="text-left">
+              <p className="text-yellow-800 font-semibold flex items-center gap-2">
+                ⚠️ Free limit reached
+              </p>
+              <p className="text-sm text-gray-700 mt-1">
+                You have reached the free limit of <strong>3 resumes</strong>.
+                Upgrade to the Lifetime plan to create unlimited resumes.
+              </p>
+            </div>
+            <button
+              onClick={() => router.push("/pricing")}
+              className="w-full sm:w-auto bg-primary text-white px-4 py-2 rounded-md hover:bg-secondary transition-colors"
+            >
+              Upgrade to Lifetime
+            </button>
+          </div>
+        </div>
+      )}
+
       {files.length === 0 ? (
         <p className="text-center text-gray-500">
           You have no files in your collection.
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {files.map((f) => (
-            <FolderCard
-              key={f.name}
-              name={f.name}
-              userId={userId}
-              onPdf={() => handleView(f.name)}
-              busy={busy === f.name}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {visibleFiles.map((f) => (
+              <FolderCard
+                key={f.name}
+                name={f.name}
+                userId={userId}
+                onPdf={() => handleView(f.name)}
+                busy={busy === f.name}
+              />
+            ))}
+          </div>
+
+          {files.length > 3 && (
+            <div className="text-center mt-6">
+              <button
+                onClick={() => setShowAll(!showAll)}
+                className="px-4 py-2 bg-primary text-white rounded hover:bg-secondary"
+              >
+                {showAll ? "See Less" : "See More"}
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {/* Preview Modal */}
@@ -239,7 +283,7 @@ export default function CollectionPage() {
               </div>
             </div>
 
-            {/* Dynamic keyword input */}
+            {/* Keyword input */}
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1">
                 Enter Keywords (comma separated)
@@ -272,7 +316,8 @@ export default function CollectionPage() {
               <div className="mb-2 font-medium text-green-700">
                 <p>ATS Score: {atsScore.finalScore}%</p>
                 <p className="text-sm text-gray-600">
-                  Keywords: {atsScore.keywordScore}% | Format: {atsScore.formatScore}%
+                  Keywords: {atsScore.keywordScore}% | Format:{" "}
+                  {atsScore.formatScore}%
                 </p>
               </div>
             )}

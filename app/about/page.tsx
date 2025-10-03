@@ -1,28 +1,28 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About Us | MakeResume",
+  title: "About Us | CViEx",
   description:
-    "Learn more about MakeResume — the AI-powered resume builder helping job seekers create professional, modern resumes with ease.",
+    "Learn more about CViEx — the AI-powered resume builder helping job seekers create professional, modern resumes with ease.",
   keywords: [
     "AI Resume Builder",
     "Online Resume Maker",
-    "MakeResume",
+    "CViEx",
     "Professional Resume Templates",
     "Smart Resume Builder",
   ],
   openGraph: {
-    title: "About Us | MakeResume",
+    title: "About Us | CViEx",
     description:
-      "MakeResume is your smart, AI-powered resume builder. Create modern, professional resumes with confidence.",
-    url: "https://yourdomain.com/about",
-    siteName: "MakeResume",
+      "CViEx is your smart, AI-powered resume builder. Create modern, professional resumes with confidence.",
+    url: "https://cviex.com/about",
+    siteName: "CViEx",
     images: [
       {
-        url: "https://yourdomain.com/og-image.png",
+        url: "https://cviex.com/og-image.png",
         width: 1200,
         height: 630,
-        alt: "MakeResume - AI Resume Builder",
+        alt: "CViEx - AI Resume Builder",
       },
     ],
     locale: "en_US",
@@ -32,19 +32,81 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8 min-h-screen flex flex-col items-center justify-center w-full text-center">
-      <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-primary">
+    <main className="max-w-5xl mx-auto py-16 px-6 min-h-screen text-gray-800">
+      <h1 className="text-4xl font-bold text-center text-primary mb-8">
         About Us
       </h1>
-      <p className="text-base sm:text-lg text-black leading-relaxed font-medium">
-        Welcome to <span className="font-bold">MakeResume</span> — your smart,
-        AI-powered resume builder. We help job seekers design professional
-        resumes effortlessly, guiding them step-by-step with smart suggestions
-        and beautiful templates.
+
+      {/* Intro */}
+      <p className="text-lg text-center leading-relaxed max-w-3xl mx-auto mb-12">
+        Welcome to <span className="font-bold">CViEx</span> — your smart,
+        AI-powered resume builder. We help job seekers design professional,
+        modern resumes effortlessly, guiding them step by step with smart
+        suggestions and beautiful templates.
       </p>
-      <p className="mt-6 text-base sm:text-lg text-black font-medium">
-        Our mission is to empower every job hunter with a strong, modern resume
-        that showcases their skills with confidence and clarity.
+
+      {/* Mission Section */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-semibold mb-3 text-primary">Our Mission</h2>
+        <p className="leading-relaxed">
+          Our mission is to empower every job seeker with a strong, modern
+          resume that showcases their skills, achievements, and personality
+          with confidence. We believe that the right resume can open the door
+          to life-changing opportunities.
+        </p>
+      </section>
+
+      {/* Vision Section */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-semibold mb-3 text-primary">Our Vision</h2>
+        <p className="leading-relaxed">
+          We envision a future where AI helps simplify career growth, enabling
+          anyone — from students to professionals — to create resumes that
+          truly stand out in front of recruiters and applicant tracking systems
+          (ATS).
+        </p>
+      </section>
+
+      {/* Core Values */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-semibold mb-3 text-primary">Our Values</h2>
+        <ul className="list-disc list-inside space-y-2 leading-relaxed">
+          <li>
+            <span className="font-semibold">Simplicity:</span> Making resume
+            creation effortless and stress-free.
+          </li>
+          <li>
+            <span className="font-semibold">Innovation:</span> Using AI to
+            deliver smart suggestions and modern templates.
+          </li>
+          <li>
+            <span className="font-semibold">Empowerment:</span> Helping users
+            take control of their career journey.
+          </li>
+          <li>
+            <span className="font-semibold">Trust:</span> Protecting your data
+            with the highest security standards.
+          </li>
+        </ul>
+      </section>
+
+      {/* Why Choose Us */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-semibold mb-3 text-primary">
+          Why Choose CViEx?
+        </h2>
+        <p className="leading-relaxed">
+          Unlike traditional resume builders, CViEx combines design excellence
+          with artificial intelligence. Our platform doesn’t just provide
+          templates — it guides you with personalized suggestions, ATS-friendly
+          formatting, and professional wording that increases your chances of
+          landing interviews.
+        </p>
+      </section>
+
+      {/* Closing */}
+      <p className="text-center text-gray-600 mt-12 text-sm">
+        Together, let’s build resumes that get noticed. 🚀
       </p>
     </main>
   );

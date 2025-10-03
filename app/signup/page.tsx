@@ -44,21 +44,20 @@ export default function SignUpPage() {
 
   return (
     <>
-      {/* 🔹 SEO Meta Tags */}
+     
       <Head>
-        <title>Sign Up | MakeResume</title>
+        <title>Sign Up | CViEx</title>
         <meta
           name="description"
-          content="Create a free account on MakeResume and start building your AI-powered professional resumes today."
+          content="Create a free account on CViEx and start building your AI-powered professional resumes today."
         />
         <meta
           name="keywords"
           content="signup, create account, resume builder, ai resume"
         />
-        <meta name="author" content="MakeResume" />
+        <meta name="author" content="CViEx" />
       </Head>
 
-      {/* 🔹 Responsive Layout */}
       <div className="min-h-screen flex items-center justify-center px-4 bg-background text-primary">
         <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-6">
           <h1 className="text-2xl font-bold text-center mb-4">Sign Up</h1>

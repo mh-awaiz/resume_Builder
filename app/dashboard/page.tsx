@@ -7,27 +7,27 @@ import type { Metadata } from "next";
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL;
 
 export const metadata: Metadata = {
-  title: "Dashboard | MakeResume",
+  title: "Dashboard | CViEx",
   description:
-    "Manage your resumes, view your collections, and create new AI-powered resumes in your MakeResume dashboard.",
+    "Manage your resumes, view your collections, and create new AI-powered resumes in your CViEx dashboard.",
   keywords: [
-    "MakeResume Dashboard",
+    "CViEx Dashboard",
     "Resume Management",
     "AI Resume Builder",
     "User Dashboard",
   ],
   openGraph: {
-    title: "Dashboard | MakeResume",
+    title: "Dashboard | CViEx",
     description:
-      "Access your personalized dashboard to create and manage resumes with MakeResume.",
+      "Access your personalized dashboard to create and manage resumes with CViEx.",
     url: `${BASE_URL}/dashboard`, 
-    siteName: "MakeResume",
+    siteName: "CViEx",
     images: [
       {
         url: `${BASE_URL}/og-dashboard.png`,
         width: 1200,
         height: 630,
-        alt: "Dashboard MakeResume",
+        alt: "Dashboard CViEx",
       },
     ],
     locale: "en_US",

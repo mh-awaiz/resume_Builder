@@ -1,24 +1,24 @@
 export default function Head() {
   return (
     <>
-      <title>Contact Us | MakeResume</title>
+      <title>Contact Us | CViEx</title>
       <meta
         name="description"
-        content="Get in touch with the MakeResume team. Have questions, feedback, or support requests? Contact us today and we'll be happy to assist you."
+        content="Get in touch with the CViEx team. Have questions, feedback, or support requests? Contact us today and we'll be happy to assist you."
       />
       <meta
         name="keywords"
-        content="Contact MakeResume, AI Resume Builder Support, Resume Help, Customer Support, MakeResume Contact"
+        content="Contact CViEx, AI Resume Builder Support, Resume Help, Customer Support, CViEx Contact"
       />
 
       {/* Open Graph Tags */}
-      <meta property="og:title" content="Contact Us | MakeResume" />
+      <meta property="og:title" content="Contact Us | CViEx" />
       <meta
         property="og:description"
-        content="Have questions or need support? Contact MakeResume today and our team will be happy to help you."
+        content="Have questions or need support? Contact CViEx today and our team will be happy to help you."
       />
       <meta property="og:url" content="https://yourdomain.com/contact" />
-      <meta property="og:site_name" content="MakeResume" />
+      <meta property="og:site_name" content="CViEx" />
       <meta
         property="og:image"
         content="https://yourdomain.com/og-contact.png"
@@ -30,10 +30,10 @@ export default function Head() {
 
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="Contact Us | MakeResume" />
+      <meta name="twitter:title" content="Contact Us | CViEx" />
       <meta
         name="twitter:description"
-        content="Have questions or need support? Contact MakeResume today."
+        content="Have questions or need support? Contact CViEx today."
       />
       <meta
         name="twitter:image"
