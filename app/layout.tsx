@@ -1,4 +1,4 @@
-// app/layout.tsx
+import React from "react";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import Script from "next/script";
@@ -113,6 +113,7 @@ export default function RootLayout({
         <Provider>{children}</Provider>
         <Footer />
         <Analytics />
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       </body>
     </html>
   );
