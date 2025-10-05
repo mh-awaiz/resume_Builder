@@ -33,10 +33,10 @@ export default function Footer() {
             Terms & Conditions
           </Link>
           <Link
-            href="/privacy&policy"
+            href="/policy"
             className="text-sm underline hover:text-cta transition"
           >
-            Privacy Policy
+            Privacy & Policy
           </Link>
         </div>
 

@@ -30,6 +30,7 @@ export const metadata: Metadata = {
     "AI Resume Builder",
     "Professional Resume",
     "CViEx",
+    "cv express",
     "Resume Templates",
     "Job Application",
   ],
