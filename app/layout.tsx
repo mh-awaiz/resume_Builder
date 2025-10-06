@@ -80,9 +80,10 @@ export default function RootLayout({
           name="google-site-verification"
           content={
             process.env.NEXT_PUBLIC_GSC_VERIFICATION ||
-            "MRBYKHpOA65wMeP5_F7ZjyPSpcijC_-SxoyV_VgfRkM"
+            "zYDs8Nl_zN3nTu5lIMvJXpTZyfde3xx7WXRdO-HxNjE"
           }
         />
+        <meta name="google-site-verification" content="zYDs8Nl_zN3nTu5lIMvJXpTZyfde3xx7WXRdO-HxNjE" />
 
         {/* Google Analytics */}
         <Script
