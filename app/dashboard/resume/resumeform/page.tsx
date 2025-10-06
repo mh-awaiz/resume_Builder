@@ -309,7 +309,7 @@ HTML OUTPUT STRUCTURE
       margin-left: 6px;
     }
     .section {
-      padding: 0 8px; /* minimal horizontal padding */
+      padding: 0 3px; 
     }
     .experience-item {
       display: flex;
