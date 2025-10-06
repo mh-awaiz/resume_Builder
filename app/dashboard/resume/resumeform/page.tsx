@@ -162,14 +162,14 @@ export default function ResumeForm({ user }: { user: any }) {
       const isPremium = profile?.is_premium;
 
       // Restrict creation for free users
-      if (!isPremium && existingFiles && existingFiles.length >= 3) {
-        alert(
-          "⚠️ Free users can create only 3 resumes. Upgrade to Lifetime to create more."
-        );
-        router.push("/pricing");
-        setLoading(false);
-        return;
-      }
+      // if (!isPremium && existingFiles && existingFiles.length >= 3) {
+      //   alert(
+      //     "⚠️ Free users can create only 3 resumes. Upgrade to Lifetime to create more."
+      //   );
+      //   router.push("/pricing");
+      //   setLoading(false);
+      //   return;
+      // }
 
       // Prepare resume data
       const resumeData = {
@@ -262,7 +262,15 @@ HTML OUTPUT STRUCTURE
       font-size: 24px;
       margin-bottom: 2px;
       font-weight: 700;
+      color: #155dfc;
     }
+
+    h1,p{
+     font-size: 24px;
+      margin-bottom: 2px;
+      font-weight: 500;
+     }
+      
     h2 {
       color: #155dfc;
       font-size: 15px;
@@ -440,77 +448,77 @@ Generate the HTML resume using the input data, following this exact layout and v
   //Plan restriction logic
   //PLEASE DO NOT DELETE THIS BLOCK OF CODE - IT HANDLES THE FREE USER LIMIT RESTRICTION
 
-  useEffect(() => {
-    const checkLimit = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return router.push("/login");
+  // useEffect(() => {
+  //   const checkLimit = async () => {
+  //     const {
+  //       data: { user },
+  //     } = await supabase.auth.getUser();
+  //     if (!user) return router.push("/login");
 
-      const { data: files } = await supabase.storage
-        .from("markdown")
-        .list(user.id, { limit: 100 });
+  //     const { data: files } = await supabase.storage
+  //       .from("markdown")
+  //       .list(user.id, { limit: 100 });
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("is_premium")
-        .eq("id", user.id)
-        .single();
+  //     const { data: profile } = await supabase
+  //       .from("profiles")
+  //       .select("is_premium")
+  //       .eq("id", user.id)
+  //       .single();
 
-      const premium = profile?.is_premium;
-      setIsPremium(premium);
+  //     const premium = profile?.is_premium;
+  //     setIsPremium(premium);
 
-      if (!premium && files && files.length >= 3) {
-        setLimitReached(true);
-      }
-    };
+  //     if (!premium && files && files.length >= 3) {
+  //       setLimitReached(true);
+  //     }
+  //   };
 
-    checkLimit();
-  }, []);
-  if (limitReached && !isPremium) {
-    return (
-      <main className="min-h-screen flex justify-center items-center bg-white p-6">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center border border-primary">
-          <h1 className="text-2xl font-bold text-primary mb-3">
-            Free Limit Reached 🚫
-          </h1>
-          <p className="text-gray-600 mb-6">
-            You’ve reached your limit of <strong>3 free resumes</strong>.
-            Upgrade to our{" "}
-            <span className="text-primary font-semibold">Lifetime Plan </span>
-            and unlock unlimited resume generations.
-          </p>
+  //   checkLimit();
+  // }, []);
+  // if (limitReached && !isPremium) {
+  //   return (
+  //     <main className="min-h-screen flex justify-center items-center bg-white p-6">
+  //       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center border border-primary">
+  //         <h1 className="text-2xl font-bold text-primary mb-3">
+  //           Free Limit Reached 🚫
+  //         </h1>
+  //         <p className="text-gray-600 mb-6">
+  //           You’ve reached your limit of <strong>3 free resumes</strong>.
+  //           Upgrade to our{" "}
+  //           <span className="text-primary font-semibold">Lifetime Plan </span>
+  //           and unlock unlimited resume generations.
+  //         </p>
 
-          <div className="bg-blue-50 p-4 rounded-xl mb-6 flex justify-center items-center flex-col">
-            <h2 className="text-lg font-semibold text-primary mb-2">
-              Lifetime Plan
-            </h2>
-            <div className="flex justify-center items-start flex-col">
-              <p className="text-gray-700">✅ Unlimited Resume Creations</p>
-              <p className="text-gray-700">✅ Access to All Templates</p>
-              <p className="text-gray-700">✅ Instant Resume Generation</p>
-              <p className="text-gray-700">✅ Premium Support</p>
-            </div>
+  //         <div className="bg-blue-50 p-4 rounded-xl mb-6 flex justify-center items-center flex-col">
+  //           <h2 className="text-lg font-semibold text-primary mb-2">
+  //             Lifetime Plan
+  //           </h2>
+  //           <div className="flex justify-center items-start flex-col">
+  //             <p className="text-gray-700">✅ Unlimited Resume Creations</p>
+  //             <p className="text-gray-700">✅ Access to All Templates</p>
+  //             <p className="text-gray-700">✅ Instant Resume Generation</p>
+  //             <p className="text-gray-700">✅ Premium Support</p>
+  //           </div>
 
-            <h3 className="text-3xl font-bold text-primary mt-3">
-              ₹99 <span className="text-sm text-gray-500">one-time</span>
-            </h3>
-          </div>
+  //           <h3 className="text-3xl font-bold text-primary mt-3">
+  //             ₹99 <span className="text-sm text-gray-500">one-time</span>
+  //           </h3>
+  //         </div>
 
-          <button
-            onClick={() => router.push("/pricing")}
-            className="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-blue-700 transition"
-          >
-            Upgrade to Lifetime
-          </button>
+  //         <button
+  //           onClick={() => router.push("/pricing")}
+  //           className="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-blue-700 transition"
+  //         >
+  //           Upgrade to Lifetime
+  //         </button>
 
-          <p className="text-sm text-gray-500 mt-4">
-            Already upgraded? Refresh the page to continue.
-          </p>
-        </div>
-      </main>
-    );
-  }
+  //         <p className="text-sm text-gray-500 mt-4">
+  //           Already upgraded? Refresh the page to continue.
+  //         </p>
+  //       </div>
+  //     </main>
+  //   );
+  // }
 
   return (
     <main className="min-h-screen bg-background text-primary font-semibold flex justify-center items-center">
