@@ -47,7 +47,7 @@ export default function Footer() {
             href="/"
             className="text-background font-semibold hover:opacity-80 transition"
           >
-            MakeResume
+            CViEx
           </Link>
           . All rights reserved.
         </p>
