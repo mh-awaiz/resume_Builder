@@ -42,20 +42,88 @@ export async function POST(req: NextRequest) {
     const styledHtml = `
       <html>
         <head>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              font-size: 11px;
-              line-height: 1.3;
-              margin: 20px;
-              transform: scale(0.95);
-              transform-origin: top left;
-              width: 105%;
-            }
-            h1,h2,h3 { font-size: 13px; margin-bottom: 4px; }
-            p,li { font-size: 11px; margin: 2px 0; }
-            .section { margin-bottom: 10px; }
-          </style>
+           <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+                color: #222;
+                margin: 8px; /* very minimal page margin */
+                line-height: 1.4;
+              }
+              header {
+                text-align: center;
+                margin-bottom: 12px; /* smaller vertical spacing */
+              }
+              h1 {
+                font-size: 24px;
+                margin-bottom: 2px;
+                font-weight: 700;
+                color: #155dfc;
+              }
+
+              h1,p{
+              font-size: 25px;
+                margin-bottom: 2px;
+                font-weight: 500;
+              }
+                
+              h2 {
+                color: #155dfc;
+                font-size: 15px;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 2px;
+                margin-top: 14px;
+                text-transform: uppercase;
+              }
+              h3 {
+                font-size: 13px;
+                margin: 4px 0 2px;
+                font-weight: 600;
+                display: flex;
+                justify-content: space-between;
+              }
+              p, ul {
+                margin: 2px 0 6px;
+                font-size: 12.5px;
+              }
+              ul {
+                padding-left: 16px;
+              }
+              .contact {
+                color: #444;
+                font-size: 12px;
+                margin: 4px 0 6px;
+              }
+              .contact span {
+                margin: 0 4px;
+              }
+              .meta {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+                margin: 0;
+                font-size: 12.5px;
+              }
+              .date {
+                font-size: 12px;
+                color: #555;
+                white-space: nowrap;
+                min-width: 50px;
+                text-align: right;
+                margin-left: 6px;
+              }
+              .section {
+                padding: 0 3px; 
+              }
+              .experience-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+              }
+              .experience-item .date {
+                min-width: 50px;
+                margin-right: 5px;
+              }
+            </style>
         </head>
         <body>${html}</body>
       </html>
