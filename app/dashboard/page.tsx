@@ -3,7 +3,6 @@ import { createClient } from "../../lib/supabase/server";
 import CreateResumeBtn from "../../components/CreateResumeBtn";
 import SeeCollections from "../../components/SeeCollections";
 import type { Metadata } from "next";
-import Link from "next/link";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL;
 
@@ -73,15 +72,6 @@ export default async function DashboardPage() {
         <CreateResumeBtn />
         <SeeCollections />
 
-        {/* <Link
-          href="/dashboard/career-optimization"
-          className="relative inline-block px-8 py-3 font-semibold text-white rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500
-      hover:from-indigo-500 hover:to-purple-500 transition-all duration-500 ease-in-out
-      transform hover:-translate-y-1 hover:scale-105 shadow-lg"
-        >
-          AI Career Optimization
-          <span className="absolute top-0 left-0 w-full h-full rounded-lg bg-white opacity-0 hover:opacity-10 transition-opacity"></span>
-        </Link> */}
       </div>
     </main>
   );
