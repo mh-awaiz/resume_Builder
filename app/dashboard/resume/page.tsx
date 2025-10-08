@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     siteName: "CViEx",
     images: [
       {
-        url: `${BASE_URL}/og-resume-dashboard.png`,
+        url: `${BASE_URL}/logo.png`,
         width: 1200,
         height: 630,
         alt: "Resume Dashboard CViEx",

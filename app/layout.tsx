@@ -27,23 +27,28 @@ export const metadata: Metadata = {
     "Create and manage your resume effortlessly with CViEx, an intuitive AI-powered resume builder. Build professional resumes in minutes.",
   keywords: [
     "Resume Builder",
+    "resume builder",
+    "ai resume builder",
     "AI Resume Builder",
     "Professional Resume",
     "CViEx",
+    "cviex",
+    "cvx",
+    "cv",
     "cv express",
     "Resume Templates",
     "Job Application",
   ],
-  authors: [{ name: "CViEx", url: "https://yourdomain.com" }],
+  authors: [{ name: "CViEx", url: "https://www.cviex.com" }],
   openGraph: {
     title: "CViEx | AI-Powered Resume Builder",
     description:
       "Create professional resumes effortlessly with CViEx, the AI-powered resume builder for job seekers.",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://yourdomain.com",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.cviex.com",
     siteName: "CViEx",
     images: [
       {
-        url: "https://yourdomain.com/og-image.png",
+        url: "https://www.cviex.com/logo2.jpg",
         width: 1200,
         height: 630,
         alt: "CViEx - AI Resume Builder",
@@ -57,11 +62,11 @@ export const metadata: Metadata = {
     title: "CViEx | AI-Powered Resume Builder",
     description:
       "Create professional resumes effortlessly with CViEx, the AI-powered resume builder for job seekers.",
-    images: ["https://yourdomain.com/og-image.png"],
+    images: ["https://www.cviex.com/logo2.jpg"],
     creator: "@CViEx",
   },
   icons: {
-    icon: "/logo.png",
+    icon: "/logo2.jpg",
     shortcut: "/favicon.ico",
   },
   metadataBase: new URL(

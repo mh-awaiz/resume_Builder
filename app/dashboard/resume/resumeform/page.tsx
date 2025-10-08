@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createClient } from "../../../../lib/supabase/browser";
 import { useRouter } from "next/navigation";
+import { categorizeSkills } from "../../../utils/categorizeSkills";
 
 export default function ResumeForm({ user }: { user: any }) {
   const router = useRouter();
@@ -25,6 +26,8 @@ export default function ResumeForm({ user }: { user: any }) {
   // Options
   const [isFresher, setIsFresher] = useState(false);
   const [isNonTech, setIsNonTech] = useState(false);
+
+  const isTechJob = !isNonTech;
 
   // Data Interfaces
   interface Skill {
@@ -65,20 +68,25 @@ export default function ResumeForm({ user }: { user: any }) {
   const [skills, setSkills] = useState<Skill[]>([
     { name: "", level: "Beginner", years: "" },
   ]);
+  const [softSkills, setSoftSkills] = useState([{ name: "", description: "" }]);
   const [education, setEducation] = useState<Education[]>([
     { degree: "", field: "", institution: "", year: "" },
   ]);
   const [certifications, setCertifications] = useState<Certification[]>([
     { name: "", issuer: "", date: "" },
   ]);
-  const [projects, setProjects] = useState<Project[]>([
-    { title: "", description: "", tech: "", date: "" },
-  ]);
   const [experience, setExperience] = useState<Experience[]>([
     { company: "", role: "", duration: "", description: "", link: "" },
   ]);
-  const [achievements, setAchievements] = useState<string[]>([""]);
+
   const [languages, setLanguages] = useState<string[]>([""]);
+
+  const [projects, setProjects] = useState([
+    { name: "", techStack: "", description: "" },
+  ]);
+  const [achievements, setAchievements] = useState([
+    { title: "", description: "" },
+  ]);
 
   // Handlers
   const handleEducationChange = (
@@ -101,16 +109,6 @@ export default function ResumeForm({ user }: { user: any }) {
     setCertifications(updated);
   };
 
-  const handleProjectChange = (
-    idx: number,
-    field: keyof Project,
-    value: string
-  ) => {
-    const updated = [...projects];
-    updated[idx][field] = value;
-    setProjects(updated);
-  };
-
   const handleExperienceChange = (
     idx: number,
     field: keyof Experience,
@@ -120,6 +118,31 @@ export default function ResumeForm({ user }: { user: any }) {
     updated[idx][field] = value;
     setExperience(updated);
   };
+
+  const handleProjectChange = (
+    idx: number,
+    field: "name" | "techStack" | "description",
+    value: string
+  ) => {
+    const updated = [...projects];
+    updated[idx][field] = value;
+    setProjects(updated);
+  };
+
+  const handleAchievementChange = (
+    idx: number,
+    field: "title" | "description",
+    value: string
+  ) => {
+    const updated = [...achievements];
+    updated[idx][field] = value;
+    setAchievements(updated);
+  };
+
+  // Categorized Skills
+  const categorizedSkills = isNonTech
+    ? {}
+    : categorizeSkills(skills.map((skill) => skill.name));
 
   // Input helper
   const inputClass = (hasValue: boolean) =>
@@ -175,12 +198,13 @@ export default function ResumeForm({ user }: { user: any }) {
       const resumeData = {
         personalInfo: { fullname, location, number, link },
         jobDescription: { jobTitle, objective },
-        skills,
+        skills: isTechJob ? categorizedSkills : [],
+        softSkills: !isTechJob ? softSkills || [] : [],
         education,
         certifications: isFresher ? [] : certifications,
-        projects: isNonTech ? [] : projects,
-        experience: isFresher ? [] : experience,
-        achievements,
+        experience: isFresher || isNonTech ? [] : experience,
+        projects: isTechJob && !isFresher ? projects : [],
+        achievements: !isTechJob ? achievements : [],
         languages,
         isFresher,
         isNonTech,
@@ -194,9 +218,75 @@ export default function ResumeForm({ user }: { user: any }) {
       const queryString = `
 SYSTEM / DNA PROMPT:
 
-You are a professional resume generator.
+You are a professional resume generator and enhancement model.
 Produce ONLY one valid, self-contained HTML document (<!doctype html> ... </html>) representing a clean, modern, ATS-optimized resume.
-Follow these rules and maintain EXACT formatting as shown below.
+Follow the rules below and maintain EXACT formatting and section order.
+
+=========================================
+DATA ENRICHMENT LOGIC
+=========================================
+If any input field from resumeData is missing, incomplete, or too short (< 50–100 words), intelligently generate realistic and industry-relevant content based on:
+- The user's job title, field, and skill set.
+- Professional tone suitable for top-tier companies.
+- Avoid placeholders or generic filler text.
+
+- For jobDescription / objective:
+  - Generate a concise, powerful 2–3 sentence summary aligned with the job title and skills.
+  - Emphasize achievements, measurable results, and motivation.
+
+- For missing experience:
+  - Generate realistic and role-appropriate bullet points (avoid fake company names).
+  - Include only if user is experienced and the role is tech-related.
+
+- For missing projects:
+  - Generate concise, realistic project descriptions only for tech jobs.
+  - Include technologies used, measurable results, and role-specific achievements.
+  - Omit projects for non-tech roles; use Achievements instead.
+
+- For missing achievements:
+  - Generate role-appropriate achievements for non-tech jobs.
+  - Include awards, recognitions, or measurable contributions.
+  - Omit achievements for tech jobs if projects exist.
+
+- For missing certifications or education details:
+  - Generate reasonable placeholders (e.g., “Google Certified – Digital Marketing Fundamentals”).
+
+- Skills handling:
+  - Use the categorizedSkills object from input data directly. Do not re-categorize unless missing.
+  - If any category is empty, optionally enrich it with relevant skills based on jobTitle.
+  - For freshers, include only the categories provided in categorizedSkills; hide Experience if applicable.
+  - For non-tech roles, display Soft Skills, Management, and Tools exactly as provided in categorizedSkills.
+
+- Always prefer real-world professional language aligned with the resume’s domain.
+-Based on given data identify whether the user is fresher and based on that generate resume may this same goes for tech and non-tech jobs.
+-MOST IMPORTANT: Sometime what happen is the content is to much and we need to create resume in one page itself sometime certifications and education section are cut which dont want it to happen at that time we can change the layout little bit we can remove unwanted spacing and we make text 2% smaller that default size.but make sure what details are given should in in one page exactly.
+-Also added simple margin inside the sub section as well. 
+
+=========================================
+SMART SKILL SEGMENTATION LOGIC
+=========================================
+When displaying skills, automatically group and label them based on their relevance:
+- For technical resumes:
+  - Categorize into **Frontend**, **Backend**, **Database**, **DevOps**, **Design/UI**, **Tools/Other**.
+  - Example:
+    Frontend: React, Next.js, Tailwind CSS, GSAP
+    Backend: Node.js, Express.js
+    Database: MongoDB, PostgreSQL
+    Tools: Git, VS Code, Postman
+- For freshers:
+  - Still segment based on recognized technologies, even if few skills are listed.
+  - Add one or two additional relevant beginner-level tools (e.g., Git, VS Code) if needed.
+- For non-technical roles:
+  - Segment into **Soft Skills**, **Management Skills**, and **Tools** (e.g., Communication, Team Leadership, MS Office, Canva).
+- Always display segmented skills under clear headings.
+- Maintain a clean, ATS-safe text-only format without bullets — just bold category labels and comma-separated skills.
+- If skill data is insufficient or too general, enrich it with typical skills for that field inferred from jobTitle and jobDescription.
+- Use the categorizedSkills object from resumeData directly.
+- Maintain category headings exactly as provided (bold) and list skills comma-separated.
+- If a category is empty, optionally enrich it with typical skills inferred from jobTitle and jobDescription.
+- Do not re-categorize or reorder skills beyond the provided categories.
+- Always display segmented skills under clear headings.
+- Maintain ATS-safe text-only format.
 
 =========================================
 OUTPUT RULES
@@ -213,12 +303,13 @@ OUTPUT RULES
 - Use consistent vertical spacing between sections (12–20px).
 - Dates format: DD/MM/YYYY or YYYY (if only year provided).
 - All important dates should appear on the RIGHT side of the section (use flexbox for alignment).
-- Skills should be a single comma-separated line (no bullets).
+- Skills should be formatted by category (as per segmentation logic).
 - Important keywords should be bolded (<strong>keyword</strong>).
 - If a section has no data, omit it.
 - For freshers → Hide Experience section.
 - For experienced → Include Experience section if provided.
 - For non-tech roles → Prefer soft skills; hide technical projects unless provided.
+-Any link add should be converted in hypertext link example in project section.
 
 =========================================
 EXPECTED VISUAL ORDER
@@ -226,7 +317,7 @@ EXPECTED VISUAL ORDER
 1. Name + Title
 2. Contact Info
 3. Objective
-4. Skills
+4. Skills (segmented)
 5. Experience (optional for freshers)
 6. Projects
 7. Education
@@ -251,12 +342,12 @@ HTML OUTPUT STRUCTURE
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
       color: #222;
-      margin: 8px; /* very minimal page margin */
+      margin: 8px;
       line-height: 1.4;
     }
     header {
       text-align: center;
-      margin-bottom: 12px; /* smaller vertical spacing */
+      margin-bottom: 12px;
     }
     h1 {
       font-size: 24px;
@@ -264,13 +355,11 @@ HTML OUTPUT STRUCTURE
       font-weight: 700;
       color: #155dfc;
     }
-
-    h1,p{
-     font-size: 24px;
+    h1, p {
+      font-size: 24px;
       margin-bottom: 2px;
       font-weight: 500;
-     }
-      
+    }
     h2 {
       color: #155dfc;
       font-size: 15px;
@@ -342,22 +431,27 @@ HTML OUTPUT STRUCTURE
   <main>
     <section id="objective">
       <h2>Objective</h2>
-      <p>Results-driven <strong>[Job Title]</strong> with [Years] of experience building responsive, accessible web applications using <strong>[Key Technologies]</strong>. Passionate about performance, UX, and clean architecture.</p>
+      <p>[Auto-generated or provided summary text]</p>
     </section>
 
     <section id="skills">
       <h2>Skills</h2>
-      <p>[Comma-separated skill list]</p>
+      <p>
+        <strong>Frontend:</strong> React, Next.js, Tailwind CSS, GSAP<br>
+        <strong>Backend:</strong> Node.js, Express.js<br>
+        <strong>Database:</strong> MongoDB<br>
+        <strong>Tools:</strong> Git, VS Code, Postman
+      </p>
     </section>
 
     <section id="experience">
       <h2>Experience</h2>
       <article>
-        <h3>Frontend Developer <span class="date">01/01/2023 – Present</span></h3>
-        <p class="meta">Company Name</p>
+        <h3>[Role / Position] <span class="date">[Start – End]</span></h3>
+        <p class="meta">[Company Name]</p>
         <ul>
-          <li>Developed <strong>high-performance</strong> user interfaces using React and Next.js.</li>
-          <li>Improved <strong>Lighthouse score</strong> by 25% through accessibility optimizations.</li>
+          <li>[Generated or provided bullet point]</li>
+          <li>[Generated or provided bullet point]</li>
         </ul>
       </article>
     </section>
@@ -365,19 +459,9 @@ HTML OUTPUT STRUCTURE
     <section id="projects">
       <h2>Projects</h2>
       <article>
-        <h3>CViEx Resume Builder <span class="date">2024</span></h3>
+        <h3>[Project Name] <span class="date">[Year]</span></h3>
         <ul>
-          <li>Developed a dynamic resume builder using <strong>Next.js</strong>, <strong>TypeScript</strong>, and <strong>Tailwind CSS</strong>.</li>
-          <li>Implemented <strong>AI-assisted description generation</strong> for better user experience.</li>
-          <li>Enabled <strong>PDF export</strong> functionality for seamless downloads.</li>
-        </ul>
-      </article>
-
-      <article>
-        <h3>Namaste Prototype <span class="date">2023</span></h3>
-        <ul>
-          <li>Designed and built a <strong>FHIR-compliant health records interface</strong> for patient data visualization.</li>
-          <li>Integrated <strong>Supabase</strong> for secure backend management.</li>
+          <li>[Generated or provided project description]</li>
         </ul>
       </article>
     </section>
@@ -385,8 +469,8 @@ HTML OUTPUT STRUCTURE
     <section id="education">
       <h2>Education</h2>
       <article>
-        <h3>Jamia Millia Islamia <span class="date">2024</span></h3>
-        <p>B.Tech in Computer Science</p>
+        <h3>[Institute Name] <span class="date">[Year]</span></h3>
+        <p>[Degree or Program]</p>
       </article>
     </section>
   </main>
@@ -394,7 +478,7 @@ HTML OUTPUT STRUCTURE
 </html>
 =========================================
 END OF PROMPT.
-Generate the HTML resume using the input data, following this exact layout and visual structure.
+Generate the HTML resume using the input data, enriching and segmenting content automatically for professional, industry-aligned output.
 `;
 
       console.log(resumeData);
@@ -434,11 +518,11 @@ Generate the HTML resume using the input data, following this exact layout and v
       setEducation([{ degree: "", field: "", institution: "", year: "" }]);
       setCertifications([{ name: "", issuer: "", date: "" }]);
       setCertifications([{ name: "", issuer: "", date: "" }]);
-      setProjects([{ title: "", description: "", tech: "", date: "" }]);
+      setProjects([{ name: "", techStack: "", description: "" }]);
       setExperience([
         { company: "", role: "", duration: "", description: "", link: "" },
       ]);
-      setAchievements([""]);
+      setAchievements([{ title: "", description: "" }]);
       setLanguages([""]);
       setIsFresher(false);
       setIsNonTech(false);
@@ -606,67 +690,328 @@ Generate the HTML resume using the input data, following this exact layout and v
 
         {/* SKILLS */}
         <section>
-          <h2 className="text-2xl font-semibold mb-4 text-primary">Skills</h2>
-          {skills.map((skill, idx) => (
+          <h2 className="text-2xl font-semibold mb-4 text-primary">
+            {isTechJob
+              ? isFresher
+                ? "Technical Skills (Optional)"
+                : "Technical Skills (Required)"
+              : isFresher
+              ? "Soft Skills (Optional)"
+              : "Soft Skills (Required)"}
+          </h2>
+
+          {(isTechJob ? skills : softSkills).map((skill, idx) => (
             <div
               key={idx}
               className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 relative"
             >
+              {/* Skill or Soft Skill Name */}
               <input
                 value={skill.name}
                 onChange={(e) => {
-                  const updated = [...skills];
+                  const updated = isTechJob ? [...skills] : [...softSkills];
                   updated[idx].name = e.target.value;
-                  setSkills(updated);
+                  if (isTechJob) {
+                    setSkills(updated as Skill[]);
+                  } else {
+                    setSoftSkills(
+                      updated as { name: string; description: string }[]
+                    );
+                  }
                 }}
                 className={inputClass(!!skill.name)}
-                placeholder="Skill Name"
+                placeholder={isTechJob ? "Skill Name" : "Soft Skill Name"}
+                required={!isFresher}
               />
-              <select
-                value={skill.level}
-                onChange={(e) => {
-                  const updated = [...skills];
-                  updated[idx].level = e.target.value;
-                  setSkills(updated);
-                }}
-                className={inputClass(!!skill.level)}
-              >
-                <option>Beginner</option>
-                <option>Intermediate</option>
-                <option>Expert</option>
-              </select>
-              <input
-                type="number"
-                value={skill.years}
-                onChange={(e) => {
-                  const updated = [...skills];
-                  updated[idx].years = e.target.value;
-                  setSkills(updated);
-                }}
-                className={inputClass(!!skill.years)}
-                placeholder="Years of Experience"
-              />
-              {skills.length > 1 && (
+
+              {isTechJob ? (
+                <>
+                  {/* Skill Level Dropdown */}
+                  <select
+                    value={(skill as Skill).level}
+                    onChange={(e) => {
+                      const updated = [...skills];
+                      updated[idx].level = e.target.value;
+                      setSkills(updated);
+                    }}
+                    className={inputClass(!!(skill as Skill).level)}
+                    required={!isFresher}
+                  >
+                    <option value="">Select Level</option>
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Expert">Expert</option>
+                  </select>
+
+                  {/* Years of Experience Input */}
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={(skill as Skill).years}
+                    onChange={(e) => {
+                      const updated = [...skills];
+                      updated[idx].years = e.target.value;
+                      setSkills(updated);
+                    }}
+                    className={inputClass(!!(skill as Skill).years)}
+                    placeholder="Years of Experience"
+                    required={!isFresher}
+                  />
+                </>
+              ) : (
+                <>
+                  {/* Soft Skill Description */}
+                  <textarea
+                    value={
+                      (skill as { name: string; description: string })
+                        .description
+                    }
+                    onChange={(e) => {
+                      const updated = [...softSkills];
+                      updated[idx].description = e.target.value;
+                      setSoftSkills(updated);
+                    }}
+                    className={`${inputClass(
+                      !!(skill as { name: string; description: string })
+                        .description
+                    )} md:col-span-2 resize-none`}
+                    placeholder="Describe this soft skill briefly"
+                    rows={2}
+                    required={!isFresher}
+                  />
+                </>
+              )}
+
+              {/* Remove Button */}
+              {(isTechJob ? skills : softSkills).length > 1 && (
                 <button
                   type="button"
                   className="absolute top-0 right-0 text-red-500 font-bold"
-                  onClick={() => setSkills(skills.filter((_, i) => i !== idx))}
+                  onClick={() =>
+                    isTechJob
+                      ? setSkills(skills.filter((_, i) => i !== idx))
+                      : setSoftSkills(softSkills.filter((_, i) => i !== idx))
+                  }
                 >
                   ×
                 </button>
               )}
             </div>
           ))}
+
+          {/* Add Another Button */}
           <button
             type="button"
             className="font-semibold text-primary hover:underline"
             onClick={() =>
-              setSkills([...skills, { name: "", level: "Beginner", years: "" }])
+              isTechJob
+                ? setSkills([
+                    ...skills,
+                    { name: "", level: "Beginner", years: "" },
+                  ])
+                : setSoftSkills([...softSkills, { name: "", description: "" }])
             }
           >
-            + Add Another Skill
+            + Add Another {isTechJob ? "Skill" : "Soft Skill"}
           </button>
         </section>
+
+        {/* CERTIFICATIONS*/}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4 text-primary">
+            {isFresher
+              ? "Certifications (Optional)"
+              : "Certifications (Required)"}
+          </h2>
+
+          {certifications.map((cert, idx) => (
+            <div
+              key={idx}
+              className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 relative"
+            >
+              <input
+                value={cert.name}
+                onChange={(e) =>
+                  handleCertificationChange(idx, "name", e.target.value)
+                }
+                className={inputClass(!!cert.name)}
+                placeholder="Certificate Name"
+                required={!isFresher}
+              />
+
+              <input
+                value={cert.issuer}
+                onChange={(e) =>
+                  handleCertificationChange(idx, "issuer", e.target.value)
+                }
+                className={inputClass(!!cert.issuer)}
+                placeholder="Issued By"
+                required={!isFresher}
+              />
+
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-600 mb-1 md:hidden">
+                  Issue Date
+                </label>
+                <input
+                  type="date"
+                  value={cert.date}
+                  onChange={(e) =>
+                    handleCertificationChange(idx, "date", e.target.value)
+                  }
+                  className={`${inputClass(!!cert.date)} w-full`}
+                  required={!isFresher}
+                />
+              </div>
+
+              {certifications.length > 1 && (
+                <button
+                  type="button"
+                  className="absolute top-0 right-0 text-red-500 font-bold"
+                  onClick={() =>
+                    setCertifications(
+                      certifications.filter((_, i) => i !== idx)
+                    )
+                  }
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+
+          <button
+            type="button"
+            className="font-semibold text-primary hover:underline"
+            onClick={() =>
+              setCertifications([
+                ...certifications,
+                { name: "", issuer: "", date: "" },
+              ])
+            }
+          >
+            + Add Another Certification
+          </button>
+        </section>
+
+        {/* PROJECTS / ACHIEVEMENTS */}
+        {isTechJob ? (
+          <section>
+            <h2 className="text-2xl font-semibold mb-4 text-primary">
+              {isFresher ? "Projects (Optional)" : "Projects (Required)"}
+            </h2>
+
+            {projects.map((proj, idx) => (
+              <div key={idx} className="space-y-3 mb-4 relative">
+                <input
+                  value={proj.name}
+                  onChange={(e) =>
+                    handleProjectChange(idx, "name", e.target.value)
+                  }
+                  className={inputClass(!!proj.name)}
+                  placeholder="Project Name"
+                  required={!isFresher}
+                />
+                <input
+                  value={proj.techStack}
+                  onChange={(e) =>
+                    handleProjectChange(idx, "techStack", e.target.value)
+                  }
+                  className={inputClass(!!proj.techStack)}
+                  placeholder="Technologies Used"
+                  required={!isFresher}
+                />
+                <textarea
+                  value={proj.description}
+                  onChange={(e) =>
+                    handleProjectChange(idx, "description", e.target.value)
+                  }
+                  className={inputClass(!!proj.description)}
+                  placeholder="Project Description / Achievements"
+                  rows={3}
+                  required={!isFresher}
+                />
+                {projects.length > 1 && (
+                  <button
+                    type="button"
+                    className="absolute top-0 right-0 text-red-500 font-bold"
+                    onClick={() =>
+                      setProjects(projects.filter((_, i) => i !== idx))
+                    }
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+
+            <button
+              type="button"
+              className="font-semibold text-primary hover:underline"
+              onClick={() =>
+                setProjects([
+                  ...projects,
+                  { name: "", techStack: "", description: "" },
+                ])
+              }
+            >
+              + Add Another Project
+            </button>
+          </section>
+        ) : (
+          <section>
+            <h2 className="text-2xl font-semibold mb-4 text-primary">
+              Achievements (Optional)
+            </h2>
+
+            {achievements.map((ach, idx) => (
+              <div key={idx} className="space-y-3 mb-4 relative">
+                <input
+                  value={ach.title}
+                  onChange={(e) =>
+                    handleAchievementChange(idx, "title", e.target.value)
+                  }
+                  className={inputClass(!!ach.title)}
+                  placeholder="Achievement Title"
+                />
+                <textarea
+                  value={ach.description}
+                  onChange={(e) =>
+                    handleAchievementChange(idx, "description", e.target.value)
+                  }
+                  className={inputClass(!!ach.description)}
+                  placeholder="Brief Description"
+                  rows={3}
+                />
+                {achievements.length > 1 && (
+                  <button
+                    type="button"
+                    className="absolute top-0 right-0 text-red-500 font-bold"
+                    onClick={() =>
+                      setAchievements(achievements.filter((_, i) => i !== idx))
+                    }
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+
+            <button
+              type="button"
+              className="font-semibold text-primary hover:underline"
+              onClick={() =>
+                setAchievements([
+                  ...achievements,
+                  { title: "", description: "" },
+                ])
+              }
+            >
+              + Add Another Achievement
+            </button>
+          </section>
+        )}
 
         {/* EDUCATION */}
         <section>
@@ -738,265 +1083,80 @@ Generate the HTML resume using the input data, following this exact layout and v
           </button>
         </section>
 
-        {/* CERTIFICATIONS — only if not a fresher */}
-        {/* CERTIFICATIONS OR EXPERIENCE */}
-        {isFresher ? (
-          <section>
-            <h2 className="text-2xl font-semibold mb-4 text-primary">
-              Certifications (Optional)
-            </h2>
-            {certifications.map((cert, idx) => (
-              <div
-                key={idx}
-                className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3 relative"
-              >
-                <input
-                  value={cert.name}
-                  onChange={(e) =>
-                    handleCertificationChange(idx, "name", e.target.value)
-                  }
-                  className={inputClass(!!cert.name)}
-                  placeholder="Certificate Name"
-                />
-                <input
-                  value={cert.issuer}
-                  onChange={(e) =>
-                    handleCertificationChange(idx, "issuer", e.target.value)
-                  }
-                  className={inputClass(!!cert.issuer)}
-                  placeholder="Issued By"
-                />
-                <input
-                  type="month"
-                  value={cert.date}
-                  onChange={(e) =>
-                    handleCertificationChange(idx, "date", e.target.value)
-                  }
-                  className={inputClass(!!cert.date)}
-                  placeholder="Issue Date"
-                />
-                {certifications.length > 1 && (
-                  <button
-                    type="button"
-                    className="absolute top-0 right-0 text-red-500 font-bold"
-                    onClick={() =>
-                      setCertifications(
-                        certifications.filter((_, i) => i !== idx)
-                      )
-                    }
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              type="button"
-              className="font-semibold text-primary hover:underline"
-              onClick={() =>
-                setCertifications([
-                  ...certifications,
-                  { name: "", issuer: "", date: "" },
-                ])
-              }
-            >
-              + Add Another Certification
-            </button>
-          </section>
-        ) : (
-          <section>
-            <h2 className="text-2xl font-semibold mb-4 text-primary">
-              Work Experience
-            </h2>
-            {experience.map((exp, idx) => (
-              <div key={idx} className="space-y-3 mb-4 relative">
-                <input
-                  value={exp.company}
-                  onChange={(e) =>
-                    handleExperienceChange(idx, "company", e.target.value)
-                  }
-                  className={inputClass(!!exp.company)}
-                  placeholder="Company Name"
-                />
-                <input
-                  value={exp.role}
-                  onChange={(e) =>
-                    handleExperienceChange(idx, "role", e.target.value)
-                  }
-                  className={inputClass(!!exp.role)}
-                  placeholder="Job Role"
-                />
-                <input
-                  value={exp.duration}
-                  onChange={(e) =>
-                    handleExperienceChange(idx, "duration", e.target.value)
-                  }
-                  className={inputClass(!!exp.duration)}
-                  placeholder="Duration"
-                />
-                <textarea
-                  value={exp.description}
-                  onChange={(e) =>
-                    handleExperienceChange(idx, "description", e.target.value)
-                  }
-                  className={inputClass(!!exp.description)}
-                  placeholder="Job Responsibilities / Achievements"
-                  rows={3}
-                />
-                {experience.length > 1 && (
-                  <button
-                    type="button"
-                    className="absolute top-0 right-0 text-red-500 font-bold"
-                    onClick={() =>
-                      setExperience(experience.filter((_, i) => i !== idx))
-                    }
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              type="button"
-              className="font-semibold text-primary hover:underline"
-              onClick={() =>
-                setExperience([
-                  ...experience,
-                  { company: "", role: "", duration: "", description: "" },
-                ])
-              }
-            >
-              + Add Another Experience
-            </button>
-          </section>
-        )}
+        {/* EXPERIENCE */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4 text-primary">
+            {isFresher
+              ? "Work Experience (Optional)"
+              : "Work Experience (Required)"}
+          </h2>
 
-        {/* PROJECTS OR EXPERIENCE */}
-        {!isNonTech ? (
-          <section>
-            <h2 className="text-2xl font-semibold mb-4 text-primary">
-              Projects
-            </h2>
-            {projects.map((proj, idx) => (
-              <div key={idx} className="space-y-3 mb-4 relative">
-                <input
-                  value={proj.title}
-                  onChange={(e) =>
-                    handleProjectChange(idx, "title", e.target.value)
+          {experience.map((exp, idx) => (
+            <div key={idx} className="space-y-3 mb-4 relative">
+              <input
+                value={exp.company}
+                onChange={(e) =>
+                  handleExperienceChange(idx, "company", e.target.value)
+                }
+                className={inputClass(!!exp.company)}
+                placeholder="Company Name"
+                required={!isFresher} // 🔸 Required only if not fresher
+              />
+              <input
+                value={exp.role}
+                onChange={(e) =>
+                  handleExperienceChange(idx, "role", e.target.value)
+                }
+                className={inputClass(!!exp.role)}
+                placeholder="Job Role"
+                required={!isFresher}
+              />
+              <input
+                value={exp.duration}
+                onChange={(e) =>
+                  handleExperienceChange(idx, "duration", e.target.value)
+                }
+                className={inputClass(!!exp.duration)}
+                placeholder="Duration"
+                required={!isFresher}
+              />
+              <textarea
+                value={exp.description}
+                onChange={(e) =>
+                  handleExperienceChange(idx, "description", e.target.value)
+                }
+                className={inputClass(!!exp.description)}
+                placeholder="Job Responsibilities / Achievements"
+                rows={3}
+                required={!isFresher}
+              />
+              {experience.length > 1 && (
+                <button
+                  type="button"
+                  className="absolute top-0 right-0 text-red-500 font-bold"
+                  onClick={() =>
+                    setExperience(experience.filter((_, i) => i !== idx))
                   }
-                  className={inputClass(!!proj.title)}
-                  placeholder="Project Title"
-                />
-                <textarea
-                  value={proj.description}
-                  onChange={(e) =>
-                    handleProjectChange(idx, "description", e.target.value)
-                  }
-                  className={inputClass(!!proj.description)}
-                  placeholder="Description"
-                  rows={3}
-                />
-                <input
-                  value={proj.tech}
-                  onChange={(e) =>
-                    handleProjectChange(idx, "tech", e.target.value)
-                  }
-                  className={inputClass(!!proj.tech)}
-                  placeholder="Technologies Used"
-                />
-                {projects.length > 1 && (
-                  <button
-                    type="button"
-                    className="absolute top-0 right-0 text-red-500 font-bold"
-                    onClick={() =>
-                      setProjects(projects.filter((_, i) => i !== idx))
-                    }
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              type="button"
-              className="font-semibold text-primary hover:underline"
-              onClick={() =>
-                setProjects([
-                  ...projects,
-                  { title: "", description: "", tech: "", date: "" },
-                ])
-              }
-            >
-              + Add Another Project
-            </button>
-          </section>
-        ) : (
-          <section>
-            <h2 className="text-2xl font-semibold mb-4 text-primary">
-              Work Experience
-            </h2>
-            {experience.map((exp, idx) => (
-              <div key={idx} className="space-y-3 mb-4 relative">
-                <input
-                  value={exp.company}
-                  onChange={(e) =>
-                    handleExperienceChange(idx, "company", e.target.value)
-                  }
-                  className={inputClass(!!exp.company)}
-                  placeholder="Company Name"
-                />
-                <input
-                  value={exp.role}
-                  onChange={(e) =>
-                    handleExperienceChange(idx, "role", e.target.value)
-                  }
-                  className={inputClass(!!exp.role)}
-                  placeholder="Job Role"
-                />
-                <input
-                  value={exp.duration}
-                  onChange={(e) =>
-                    handleExperienceChange(idx, "duration", e.target.value)
-                  }
-                  className={inputClass(!!exp.duration)}
-                  placeholder="Duration"
-                />
-                <textarea
-                  value={exp.description}
-                  onChange={(e) =>
-                    handleExperienceChange(idx, "description", e.target.value)
-                  }
-                  className={inputClass(!!exp.description)}
-                  placeholder="Job Responsibilities / Achievements"
-                  rows={3}
-                />
-                {experience.length > 1 && (
-                  <button
-                    type="button"
-                    className="absolute top-0 right-0 text-red-500 font-bold"
-                    onClick={() =>
-                      setExperience(experience.filter((_, i) => i !== idx))
-                    }
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              type="button"
-              className="font-semibold text-primary hover:underline"
-              onClick={() =>
-                setExperience([
-                  ...experience,
-                  { company: "", role: "", duration: "", description: "" },
-                ])
-              }
-            >
-              + Add Another Experience
-            </button>
-          </section>
-        )}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+
+          <button
+            type="button"
+            className="font-semibold text-primary hover:underline"
+            onClick={() =>
+              setExperience([
+                ...experience,
+                { company: "", role: "", duration: "", description: "" },
+              ])
+            }
+          >
+            + Add Another Experience
+          </button>
+        </section>
 
         {/* SUBMIT */}
         <div className="text-center mt-10">

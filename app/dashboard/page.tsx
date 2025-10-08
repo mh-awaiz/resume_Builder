@@ -3,6 +3,7 @@ import { createClient } from "../../lib/supabase/server";
 import CreateResumeBtn from "../../components/CreateResumeBtn";
 import SeeCollections from "../../components/SeeCollections";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL;
 
@@ -12,15 +13,19 @@ export const metadata: Metadata = {
     "Manage your resumes, view your collections, and create new AI-powered resumes in your CViEx dashboard.",
   keywords: [
     "CViEx Dashboard",
+    "cvx",
+    "cviex",
     "Resume Management",
     "AI Resume Builder",
     "User Dashboard",
+    "Resume Builder",
+    "resume builder",
   ],
   openGraph: {
     title: "Dashboard | CViEx",
     description:
       "Access your personalized dashboard to create and manage resumes with CViEx.",
-    url: `${BASE_URL}/dashboard`, 
+    url: `${BASE_URL}/dashboard`,
     siteName: "CViEx",
     images: [
       {
@@ -67,6 +72,16 @@ export default async function DashboardPage() {
       <div className="flex flex-col items-center justify-center gap-4 p-1 space-x-2">
         <CreateResumeBtn />
         <SeeCollections />
+
+        {/* <Link
+          href="/dashboard/career-optimization"
+          className="relative inline-block px-8 py-3 font-semibold text-white rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500
+      hover:from-indigo-500 hover:to-purple-500 transition-all duration-500 ease-in-out
+      transform hover:-translate-y-1 hover:scale-105 shadow-lg"
+        >
+          AI Career Optimization
+          <span className="absolute top-0 left-0 w-full h-full rounded-lg bg-white opacity-0 hover:opacity-10 transition-opacity"></span>
+        </Link> */}
       </div>
     </main>
   );

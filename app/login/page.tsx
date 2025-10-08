@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Login | CViEx",
     description: "Login to access your personalized CViEx dashboard.",
-    url: "https://yourdomain.com/login",
+    url: "https://www.cviex.com/login",
     siteName: "CViEx",
   },
 };
