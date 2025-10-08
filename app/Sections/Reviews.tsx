@@ -3,9 +3,17 @@
 import { motion } from "framer-motion";
 
 const reviews = [
-  { name: "Alice", feedback: "Amazing platform! My resume got noticed instantly." },
-  { name: "Bob", feedback: "Easy, fast, and professional." },
-  { name: "Charlie", feedback: "Highly recommend for job seekers." },
+  {
+    name: "Anas Hasan",
+    feedback:
+      "Website is good specially for freshers who don't know how to prepare CV it is very helpful",
+  },
+  { name: "Vansh", feedback: "Easy, fast, and professional." },
+  {
+    name: "Prashant",
+    feedback:
+      "CViEx is a game-changer! Instantly created ultra-professional CVs with ease. A must-try for those who struggles with CV!",
+  },
 ];
 
 export default function Reviews() {
