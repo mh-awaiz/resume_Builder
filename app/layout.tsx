@@ -66,7 +66,8 @@ export const metadata: Metadata = {
     creator: "@CViEx",
   },
   icons: {
-    icon: "/logo2.jpg",
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
     shortcut: "/favicon.ico",
   },
   metadataBase: new URL(
@@ -88,7 +89,10 @@ export default function RootLayout({
             "zYDs8Nl_zN3nTu5lIMvJXpTZyfde3xx7WXRdO-HxNjE"
           }
         />
-        <meta name="google-site-verification" content="zYDs8Nl_zN3nTu5lIMvJXpTZyfde3xx7WXRdO-HxNjE" />
+        <meta
+          name="google-site-verification"
+          content="zYDs8Nl_zN3nTu5lIMvJXpTZyfde3xx7WXRdO-HxNjE"
+        />
 
         {/* Google Analytics */}
         <Script
